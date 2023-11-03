@@ -1,5 +1,4 @@
 #CORREGIR CÓMO SE MUESTRAN LOS DATOS DE UN ARCHIVO DE EXCELL.
-
 import PySimpleGUI as sg
 import pandas as pd
 import magic 
@@ -17,12 +16,13 @@ layout = [
     [sg.Menu(menu_def, tearoff=True)],
     [sg.Text('CHOOSE YOUR FILE', size=(30, 1), justification='centre', font=("Helvetica", 15), relief=sg.RELIEF_RAISED, expand_x=True)],
     [sg.Text('File', size=(15, 1), auto_size_text=False, justification='right'),
-     sg.InputText('Default File',  key = '-FILENAME-'),sg.FileBrowse(file_types=(("All Files", "*.*"),))], #se puede limitar el tipo de archivo al que se quiere permitir seleccionar.                                                                   #estableccemos el parámetro key para poder acceder posteriormente al elemento.
+     sg.InputText('Default File',  key = '-FILENAME-', expand_x=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))], #se puede limitar el tipo de archivo al que se quiere permitir seleccionar.                                                                   #estableccemos el parámetro key para poder acceder posteriormente al elemento.
     [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()],
-    [sg.Multiline('', size=(50, 10), key='-FILE_CONTENT-', disabled=True, auto_refresh=True)]
+    [sg.Multiline('', size=(110, 50), key='-FILE_CONTENT-', disabled=True, auto_refresh=True)],
+    
     ]                                                                 #cambiando filebrowse por folderbrowse seleccionamos o archivos o carpetas.
 
-window = sg.Window('Everything bagel', layout, default_element_size=(40, 1), grab_anywhere=False)
+window = sg.Window('Everything bagel', layout,size=(800,600), default_element_size=(40, 1), grab_anywhere=False)
 event, values = window.read()
 
 while True:
@@ -46,11 +46,29 @@ while True:
                 with open(selected_file, 'r') as file:
                     file_content = file.read()
                 window['-FILE_CONTENT-'].update(file_content)
+            num_lines = file_content.count('\n')+1
+            window['-FILE_CONTENT-'].Widget.config(height=num_lines)
         
         except Exception as e:
             sg.popup_error(f'Error: {str(e)}')
+    
+    
+    if event == '-HSCROLL-':
+        scroll_value = int(values['-HSCROLL-'])
+        window['-FILE_CONTENT-'].update(file_content[scroll_value:scroll_value + 50])
+    
 
 window.close()
+
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
+print('hola gilberto')
 
 '''
 sg.Popup('Title',
@@ -58,7 +76,5 @@ sg.Popup('Title',
          'The button clicked was "{}"'.format(event),
          'The values are', values)
 '''
-
-
 
 

@@ -1,17 +1,3 @@
-
-
-
-#ivan bujarrilla
-
-
-
-
-
-
-
-
-
-
 import PySimpleGUI as sg
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -22,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 layout = [
     [sg.Text('Selecciona un archivo CSV')],
     [sg.InputText(key='Archivo'), sg.FileBrowse()],
-    [sg.Checkbox('Variable 1', key='Variable1'), sg.Checkbox('Variable 2', key='Variable2')],
+    [sg.Radio('Variable 1', 'VAR', key='Variable1'), sg.Radio('Variable 2', 'VAR', key='Variable2')],
     [sg.Button('Realizar Regresión'), sg.Button('Salir')],
     [sg.Text('', size=(30, 1), key='Resultado')]
 ]
@@ -40,7 +26,7 @@ while True:
         archivo = values['Archivo']
         datos = pd.read_csv(archivo)
         
-        # Seleccionar las variables según los checkboxes
+        # Seleccionar la variable según el radiobutton seleccionado
         if values['Variable1']:
             x = datos['Variable1'].values.reshape(-1, 1)
         else:
@@ -68,8 +54,3 @@ while True:
 
 # Cerrar la ventana de la interfaz gráfica al salir
 window.close()
-
-
-
-
-

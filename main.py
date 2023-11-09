@@ -6,6 +6,23 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
 import sqlite3
+import PySimpleGUI as sg
+
+
+
+def interface():
+    # Definir el diseño de la interfaz gráfica
+    layout = [
+        [sg.Text('Selecciona un archivo')],
+        [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
+        [sg.Radio('Archivo Excell', 'Archivo', key = 'Archivo Excell'), sg.Radio('Archivo CSV', 'Archivo', key = 'Archivo CSV'), sg.Radio('Archivo DB', 'Archivo', key = 'Archivo DB')],
+        [sg.Button('Realizar Regresión'), sg.Button('Salir')],
+        [sg.Text('', size=(30, 1), key='Resultado')]
+    ]
+
+    # Crear la ventana de la interfaz gráfica
+    window = sg.Window('Aplicación de Regresión', layout)
 
 
 
@@ -155,7 +172,7 @@ def menu1(dfs):
     
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
     dfs = {}
 
     menu1(dfs)

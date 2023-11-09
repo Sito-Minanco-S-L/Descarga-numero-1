@@ -7,50 +7,87 @@ import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
 import sqlite3
 import PySimpleGUI as sg
-
-
-
-def interface():
-    # Definir el diseño de la interfaz gráfica
-    layout = [
-        [sg.Text('Selecciona un archivo')],
-        [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
-        [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
-        [sg.Radio('Archivo Excell', 'Archivo', key = 'Archivo Excell'), sg.Radio('Archivo CSV', 'Archivo', key = 'Archivo CSV'), sg.Radio('Archivo DB', 'Archivo', key = 'Archivo DB')],
-        [sg.Button('Realizar Regresión'), sg.Button('Salir')],
-        [sg.Text('', size=(30, 1), key='Resultado')]
-    ]
-
-    # Crear la ventana de la interfaz gráfica
-    window = sg.Window('Aplicación de Regresión', layout)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+import magic 
+
 
 
 
 
 def interface():
-    layout = [
+    layout0 = [
+        [sg.Button('Cargar archivo')],
+        [sg.Button('Mostrar modelos')],
+        [sg.Button('Cargar modelo')]
+    ]
+    
+    layout1 = [
         [sg.Text('Selecciona un archivo')],
         [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
         [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
-        [sg.Radio('Archivo Excell', 'Archivo', key = 'Archivo Excell'), sg.Radio('Archivo CSV', 'Archivo', key = 'Archivo CSV'), sg.Radio('Archivo DB', 'Archivo', key = 'Archivo DB')],
         [sg.Button('Realizar Regresión'), sg.Button('Salir')],
-        [sg.Text('', size=(30, 1), key='Resultado')]
+        [sg.Text('Resultado de la Regresión Lineal:', size=(30, 1), key='ResultadoRegresion')],
+        [sg.Button('Guardar Modelo')]
     ]
 
-    # Crear la ventana de la interfaz gráfica
-    window = sg.Window('Aplicación de Regresión', layout)
+    layout2 = [
+        [sg.Text('Guardar Modelo de Regresión Lineal')],
+        [sg.FileSaveAs(key='fig_save',file_types=(('FARLOPA', '.farlopa')))]
+    ]
+
+    
+    # Crear ventana menu
+    window = sg.Window('Aplicación de Regresión', layout0)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Salir':
+            break
+        if event == 'Cargar archivo':
+            #ventana opcion cargar archivos
+            window = sg.Window('Aplicación de Regresión', layout1)
+            break
 
 
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
+        if event == 'Submit':
+            selected_file = values['-FILENAME-'] 
+            try:
+                mime = magic.Magic()
+                mime_type = mime.from_file(selected_file)
+                if 'excel' in mime_type.lower():
+                    df = pd.read_excel(selected_file)
+                    df_numeric = df.select_dtypes(include=[np.number])
+                    file_content = df_numeric.to_string(index=False)
+                    window['-FILE_CONTENT-'].update(file_content)
+                
+                if 'csv' in mime_type.lower():
+                    df = pd.read_csv(selected_file)
+                    df_numeric = df.select_dtypes(include=[np.number])
+                    file_content = df_numeric.to_string(index=False)
+                    window['-FILE_CONTENT-'].update(file_content)
 
-        if event == 'Archivo Excell':
-            cargar_excell()
+                if 'db' in mime_type.lower():
+                    df = pd.read_excel(selected_file)
+                    df_numeric = df.select_dtypes(include=[np.number])
+                    file_content = df_numeric.to_string(index=False)
+                    window['-FILE_CONTENT-'].update(file_content)
+                
+                else:
+                    with open(selected_file, 'r') as file:
+                        file_content = file.read()
+                    window['-FILE_CONTENT-'].update(file_content)
+                num_lines = file_content.count('\n')+1
+                window['-FILE_CONTENT-'].Widget.config(height=num_lines) 
+
+            except Exception as e:
+                sg.popup_error(f'Error: {str(e)}')
+        
 
         if event == 'Realizar Regresión':
             # Leer los datos del archivo seleccionado
@@ -82,6 +119,13 @@ def interface():
             
             # Mostrar el error cuadrático medio en la interfaz gráfica
             window['Resultado'].update(f'Error Cuadrático Medio: {mse:.2f}')
+
+
+        if event == 'Guardar Modelo':
+            window = sg.Window('Aplicación de Regresión', layout2)
+
+
+    
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()
@@ -123,7 +167,7 @@ def cargar_csv(file_name):
     print(df_numeric)
     return(df_numeric)    
 
-def cargar_excell(file_name):
+def cargar_excel(file_name):
     df = pd.read_excel(file_name)
     df_numeric = df.select_dtypes(include=[np.number])
     #print(df)
@@ -177,7 +221,7 @@ def menu1(dfs):
     if option == 2:
         file_name = str(input("file_name: "))
         os.system('clear')
-        df = cargar_excell(file_name)
+        df = cargar_excel(file_name)
         dfs[file_name] = df
         menu1(dfs)
 
@@ -244,6 +288,8 @@ def menu1(dfs):
             nombre_modelo = str(input("Nombre modelo: "))
             modelo.save(nombre_modelo+'.chantada')
 
+        [sg.Text('Resultado de la Regresión Lineal:', size=(30, 1), key='ResultadoRegresion')]
+        
         menu1(dfs)
 
     if option == 6:
@@ -256,10 +302,7 @@ def menu1(dfs):
 
 
         
-    
-    
 
-    
 
 
 if __name__ == '__main__':    

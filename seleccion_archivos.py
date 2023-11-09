@@ -3,6 +3,22 @@ import PySimpleGUI as sg
 import pandas as pd
 import magic 
 sg.ChangeLookAndFeel('GreenTan')
+import numpy as np
+
+
+
+import os
+import csv
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from sklearn.model_selection import train_test_split
+import sqlite3
+
+from sklearn.linear_model import LinearRegression
+
+from sklearn.metrics import mean_squared_error
+
+
 
 '''
 # ------ Menu Definition ------ #
@@ -40,8 +56,31 @@ while True:
 
             if 'excel' in mime_type.lower():
                 df = pd.read_excel(selected_file)
-                file_content = df.to_string(index=False)
+                df_numeric = df.select_dtypes(include=[np.number])
+                file_content = df_numeric.to_string(index=False)
                 window['-FILE_CONTENT-'].update(file_content)
+            
+            elif 'csv' in mime_type.lower():
+                df = pd.read_csv(selected_file)
+                df_numeric = df.select_dtypes(include=[np.number])
+                file_content = df_numeric.to_string(index=False)
+                window['-FILE_CONTENT-'].update(file_content)
+            
+           
+           
+            elif 'db' in mime_type.lower():
+                conexion = sqlite3.connect(selected_file)
+                cursor = conexion.cursor()
+                consulta_sql = 'SELECT * FROM california_housing_dataset'
+                cursor.execute(consulta_sql)
+                resultados = cursor.fetchall()
+                nombres_columnas = [descripcion[0] for descripcion in cursor.description]
+                df = pd.DataFrame(resultados, columns=nombres_columnas)
+                df_numeric = df.select_dtypes(include=[np.number])
+                file_content = df_numeric.to_string(index=False)
+                window['-FILE_CONTENT-'].update(file_content)
+
+
             else:
                 with open(selected_file, 'r') as file:
                     file_content = file.read()

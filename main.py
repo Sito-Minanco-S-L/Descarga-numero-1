@@ -42,6 +42,7 @@ def cargar_basededatos(file_name):
     print(df_numeric)
 
     conexion.close()
+    return(df_numeric)
 
 def menu1(dfs):
     

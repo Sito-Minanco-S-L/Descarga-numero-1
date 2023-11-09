@@ -5,6 +5,8 @@ import numpy as np
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
+import sqlite3
+
 
 
 def cargar_csv(file_name):
@@ -20,6 +22,26 @@ def cargar_excell(file_name):
     #print(df)
     print(df_numeric)
     return(df_numeric)
+
+def cargar_basededatos(file_name):
+    conexion = sqlite3.connect('housing.db')
+    cursor = conexion.cursor()
+
+
+    consulta_sql = 'SELECT * FROM california_housing_dataset'
+    cursor.execute(consulta_sql)
+    resultados = cursor.fetchall()
+
+
+    nombres_columnas = [descripcion[0] for descripcion in cursor.description]
+
+    df = pandas.DataFrame(resultados, columns=nombres_columnas)
+
+
+    print('DataFrame de usuarios:')
+    print(df)
+
+    conexion.close()
 
 def menu1(dfs):
     

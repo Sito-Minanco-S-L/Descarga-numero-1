@@ -1,3 +1,4 @@
+'''
 import sqlite3
 import pandas 
 
@@ -59,7 +60,7 @@ def cargar_basededatos(file_name):
 
 #ivan bujarrilla
 
-
+'''
 
 
 
@@ -73,12 +74,14 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+import numpy as np
 
 # Definir el diseño de la interfaz gráfica
 layout = [
-    [sg.Text('Selecciona un archivo CSV')],
-    [sg.InputText(key='Archivo'), sg.FileBrowse()],
-    [sg.Checkbox('Variable 1', key='Variable1'), sg.Checkbox('Variable 2', key='Variable2')],
+    [sg.Text('Selecciona un archivo')],
+    [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+    [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
+    [sg.Radio('Archivo Excell', 'Archivo', key = 'Archivo Excell'), sg.Radio('Archivo CSV', 'Archivo', key = 'Archivo CSV'), sg.Radio('Archivo DB', 'Archivo', key = 'Archivo DB')],
     [sg.Button('Realizar Regresión'), sg.Button('Salir')],
     [sg.Text('', size=(30, 1), key='Resultado')]
 ]
@@ -91,6 +94,10 @@ while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == 'Salir':
         break
+
+    if event == 'Archivo Excell':
+        
+
     if event == 'Realizar Regresión':
         # Leer los datos del archivo seleccionado
         archivo = values['Archivo']
@@ -129,4 +136,4 @@ window.close()
 
 
 
-pip install PySimpleGUI
+#pip install PySimpleGUI

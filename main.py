@@ -54,6 +54,7 @@ def menu1(dfs):
 -> 3: Cargar base de datos
 -> 4: Mostrar archivos cargados
 -> 5: Hacer regresion lineal
+-> 6: Cargar modelo
 -> 0: Salir del programa
 """)
     option = int(input(": "))
@@ -128,8 +129,24 @@ def menu1(dfs):
         modelo = sm.OLS(endog=y_train, exog=X_train,)
         modelo = modelo.fit()
         print("\n", modelo.summary())
+        
+        print("¿Desea guardar el modelo? (s/n): ")
+        op = str(input(": "))
+
+        if op == 's':
+            nombre_modelo = str(input("Nombre modelo: "))
+            modelo.save(nombre_modelo+'.chantada')
 
         menu1(dfs)
+
+    if option == 6:
+        nombre_modelo = str(input("Introduzca el nombre del modelo a cagar: "))
+        modelo1 = sm.load(nombre_modelo+'.chantada')
+        print("\n", modelo1.summary())
+
+        menu1(dfs)
+
+
 
         
     

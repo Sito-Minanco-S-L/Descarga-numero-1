@@ -24,7 +24,7 @@ def cargar_excell(file_name):
     return(df_numeric)
 
 def cargar_basededatos(file_name):
-    conexion = sqlite3.connect('housing.db')
+    conexion = sqlite3.connect(file_name)
     cursor = conexion.cursor()
 
 
@@ -38,8 +38,8 @@ def cargar_basededatos(file_name):
     df = pandas.DataFrame(resultados, columns=nombres_columnas)
 
 
-    print('DataFrame de usuarios:')
-    print(df)
+    df_numeric = df.select_dtypes(include=[np.number])
+    print(df_numeric)
 
     conexion.close()
 
@@ -50,8 +50,9 @@ def menu1(dfs):
           
 -> 1: Cargar datos csv
 -> 2: Cargar datos excel
--> 3: Mostrar archivos cargados
--> 4: Hacer regresion lineal
+-> 3: Cargar base de datos
+-> 4: Mostrar archivos cargados
+-> 5: Hacer regresion lineal
 -> 0: Salir del programa
 """)
     option = int(input(": "))
@@ -70,15 +71,22 @@ def menu1(dfs):
         df = cargar_excell(file_name)
         dfs[file_name] = df
         menu1(dfs)
-    
+
     if option == 3:
+        file_name = str(input("file_name: "))
+        os.system('clear')
+        df = cargar_basededatos(file_name)
+        dfs[file_name] = df
+        menu1(dfs)
+    
+    if option == 4:
         for i in dfs.keys():
             print(i)
 
         menu1(dfs)
 
     
-    if option == 4:
+    if option == 5:
         print("Seleciona el archivo: ")
         for i in dfs.keys():
             print(i)

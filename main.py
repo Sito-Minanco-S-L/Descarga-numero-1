@@ -1,23 +1,114 @@
 import os
 import csv
-import pandas
+import pandas as pd
 import numpy as np
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
 import sqlite3
+import PySimpleGUI as sg
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 
 
+
+
+def interface():
+    layout = [
+        [sg.Text('Selecciona un archivo')],
+        [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
+        [sg.Radio('Archivo Excell', 'Archivo', key = 'Archivo Excell'), sg.Radio('Archivo CSV', 'Archivo', key = 'Archivo CSV'), sg.Radio('Archivo DB', 'Archivo', key = 'Archivo DB')],
+        [sg.Button('Realizar Regresión'), sg.Button('Salir')],
+        [sg.Text('', size=(30, 1), key='Resultado')]
+    ]
+
+    # Crear la ventana de la interfaz gráfica
+    window = sg.Window('Aplicación de Regresión', layout)
+
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Salir':
+            break
+
+        if event == 'Archivo Excell':
+            cargar_excell()
+
+        if event == 'Realizar Regresión':
+            # Leer los datos del archivo seleccionado
+            archivo = values['Archivo']
+            datos = pd.read_csv(archivo)
+            
+            # Seleccionar las variables según los checkboxes
+            if values['Variable1']:
+                x = datos['Variable1'].values.reshape(-1, 1)
+            else:
+                x = datos['Variable2'].values.reshape(-1, 1)
+            
+            y = datos['Variable_objetivo'].values
+            
+            # Dividir los datos en conjuntos de entrenamiento y prueba
+            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+            
+            # Crear un modelo de regresión lineal
+            modelo = LinearRegression()
+            
+            # Entrenar el modelo
+            modelo.fit(x_train, y_train)
+            
+            # Realizar predicciones en el conjunto de prueba
+            y_pred = modelo.predict(x_test)
+            
+            # Calcular el error cuadrático medio
+            mse = mean_squared_error(y_test, y_pred)
+            
+            # Mostrar el error cuadrático medio en la interfaz gráfica
+            window['Resultado'].update(f'Error Cuadrático Medio: {mse:.2f}')
+
+# Cerrar la ventana de la interfaz gráfica al salir
+    window.close()
+
+
+'''
+if event == 'Submit':
+        selected_file = values['-FILENAME-']
+         #sg.popup(f'File selected: {selected_file}') #para mostrar el nombre del archivo que se selecciona.
+        try:
+            mime = magic.Magic()
+            mime_type = mime.from_file(selected_file)
+
+            if 'excel' in mime_type.lower():
+                df = pd.read_excel(selected_file)
+                file_content = df.to_string(index=False)
+                window['-FILE_CONTENT-'].update(file_content)
+            else:
+                with open(selected_file, 'r') as file:
+                    file_content = file.read()
+                window['-FILE_CONTENT-'].update(file_content)
+            num_lines = file_content.count('\n')+1
+            window['-FILE_CONTENT-'].Widget.config(height=num_lines)
+        
+        except Exception as e:
+            sg.popup_error(f'Error: {str(e)}')
+    
+    
+    if event == '-HSCROLL-':
+        scroll_value = int(values['-HSCROLL-'])
+        window['-FILE_CONTENT-'].update(file_content[scroll_value:scroll_value + 50])
+
+'''
 
 def cargar_csv(file_name):
-    df = pandas.read_csv(file_name, sep = ',')
+    df = pd.read_csv(file_name, sep = ',')
     df_numeric = df.select_dtypes(include=[np.number])
     #print(df)
     print(df_numeric)
     return(df_numeric)    
 
 def cargar_excell(file_name):
-    df = pandas.read_excel(file_name)
+    df = pd.read_excel(file_name)
     df_numeric = df.select_dtypes(include=[np.number])
     #print(df)
     print(df_numeric)
@@ -35,7 +126,7 @@ def cargar_basededatos(file_name):
 
     nombres_columnas = [descripcion[0] for descripcion in cursor.description]
 
-    df = pandas.DataFrame(resultados, columns=nombres_columnas)
+    df = pd.DataFrame(resultados, columns=nombres_columnas)
 
 
     df_numeric = df.select_dtypes(include=[np.number])
@@ -158,5 +249,6 @@ def menu1(dfs):
 if __name__ == '__main__':
     dfs = {}
 
-    menu1(dfs)
+    #menu1(dfs)
+    interface()
 

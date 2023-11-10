@@ -52,7 +52,8 @@ def mostrar_resultados(modelo):
         [sg.Multiline(resultados_str, size=(80, 20), font=('Courier New', 10))],
         [sg.Text(f'Bondad del ajuste: {r_cuadrado:.4f}', font=('Helvetica', 14), text_color=color)],
         [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))],
-        [sg.Button('OK', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'green'))]
+        [sg.Button('OK', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'green')),sg.SaveAs('Guardar Modelo', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'blue'),file_types=(('FARLOPA', '.farlopa'),),default_extension=str('.farlopa'),key='--FILE--' )]
+
     ]
 
     window = sg.Window('Resultados', layout, finalize=True)
@@ -62,6 +63,9 @@ def mostrar_resultados(modelo):
 
         if event == sg.WINDOW_CLOSED or event == 'OK':
             break
+
+        elif event == 'GUARDAR MODELO':
+            modelo.save(values('--FILE--'))
 
     window.close()
 
@@ -120,27 +124,18 @@ def interface(dfs:dict):
     
     layout1 = [
         [sg.Text('Selecciona un archivo')],
-        [sg.InputText(key='Archivo'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
-        [sg.Checkbox('X', key='X'), sg.Checkbox('Y', key='Y')],
-        [sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')],
-        [sg.Button('Guardar Modelo')]
+        [sg.InputText(key='-Archivo-'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]
     ]
 
     layout2 = [
         [sg.Text('Guardar Modelo de Regresión Lineal')],
-        [sg.FileSaveAs(key='fig_save',file_types=(('FARLOPA', '.farlopa')))]
+        [sg.FileSaveAs(key='fig_save',file_types=(('FARLOPA', '.farlopa'),))]
     ]
-    
-    layout3 = [
-            [sg.Text('Seleccione el archivo:', font=('Helvetica', 12), size=(25, 1)),
-             sg.InputCombo(values=list(dfs.keys()), key='archivo')],
-            [sg.Button('Seleccionar', size=(20, 2), button_color=('white', 'green')),
-             sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],
-        ]
 
     
     # Crear ventana menu
-    window = sg.Window('Aplicación de Regresión', layout0)
+    window = sg.Window('Aplicación de Regresión', layout0, finalize=True)
 
     while True:
         event, values = window.read()
@@ -150,14 +145,20 @@ def interface(dfs:dict):
             #ventana opcion cargar archivos
             window = sg.Window('Aplicación de Regresión', layout1)
             break
+        if event == 'Mostrar modelos':
+            window = sg.Window('Aplicación de Regresión', [[sg.Text('Esta merda esta sin facer')]])
+        if event == 'Cargar modelo':
+            window = sg.Window('Aplicación de Regresión', [[sg.Text('Esta merda esta sin facer')]])
+
+
 
 
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
-        if event == 'Submit':
-            selected_file = values['-FILENAME-'] 
+        if event == 'Cargar Archivo':
+            selected_file = values['-Archivo-'] 
             try:
                 mime = magic.Magic()
                 mime_type = mime.from_file(selected_file)
@@ -165,35 +166,42 @@ def interface(dfs:dict):
                     df = pd.read_excel(selected_file)
                     df_numeric = df.select_dtypes(include=[np.number])
                     file_content = df_numeric.to_string(index=False)
-                    window['-FILE_CONTENT-'].update(file_content)
                     dfs[selected_file] = df_numeric
+                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
+                    #window['-FILE_CONTENT-'].update(file_content)
                 
                 if 'csv' in mime_type.lower():
+                    print('hola')
                     df = pd.read_csv(selected_file)
                     df_numeric = df.select_dtypes(include=[np.number])
                     file_content = df_numeric.to_string(index=False)
-                    window['-FILE_CONTENT-'].update(file_content)
                     dfs[selected_file] = df_numeric
+                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
+
+                    #window['-FILE_CONTENT-'].update(file_content)
+
 
 
                 if 'db' in mime_type.lower():
                     df = pd.read_excel(selected_file)
                     df_numeric = df.select_dtypes(include=[np.number])
                     file_content = df_numeric.to_string(index=False)
-                    window['-FILE_CONTENT-'].update(file_content)
                     dfs[selected_file] = df_numeric
+                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
+
+                    #window['-FILE_CONTENT-'].update(file_content)
 
                 
-                else:
-                    with open(selected_file, 'r') as file:
-                        file_content = file.read()
-                    window['-FILE_CONTENT-'].update(file_content)
-                num_lines = file_content.count('\n')+1
-                window['-FILE_CONTENT-'].Widget.config(height=num_lines) 
+                #else:
+                    #with open(selected_file, 'r') as file:
+                        #file_content = file.read()
+                    #window['-FILE_CONTENT-'].update(file_content)
+                #num_lines = file_content.count('\n')+1
+                #window['-FILE_CONTENT-'].Widget.config(height=num_lines) 
 
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
-        
+
         # ESTE IF ME PARECE Q NON SE USAAAA!!  (o siguiente e o de nathan)
         if event == 'Realizar Regresión':##ESTO CREO Q NON SE ESTA USANDO
             # Leer los datos del archivo seleccionado
@@ -218,12 +226,16 @@ def interface(dfs:dict):
             mse = mean_squared_error(y_test, y_pred)
             # Mostrar el error cuadrático medio en la interfaz gráfica
             window['Resultado'].update(f'Error Cuadrático Medio: {mse:.2f}')
-        window = sg.Window('Seleccionar Archivo', layout1, finalize=True)
 
 
 
-        if event == 'Realizar Regresion Lineal':#PARTE DE NATHAN
-            window = sg.Window('Regresión Lineal', layout3, finalize=True)
+        if event == 'Realizar Regresión Lineal':#PARTE DE NATHAN
+            window = sg.Window('Aplicacion de regresion', [
+            [sg.Text('Seleccione el archivo:', font=('Helvetica', 12), size=(25, 1)),
+             sg.InputCombo(values=list(dfs.keys()), key='archivo')],
+            [sg.Button('Seleccionar', size=(20, 2), button_color=('white', 'green')),
+             sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],
+        ])
 
             while True:
                 event, values = window.read()

@@ -95,7 +95,7 @@ while True:
     if event == sg.WIN_CLOSED or event == 'Salir':
         break
 
-    if event == 'Archivo Excell':
+    
         
 
     if event == 'Realizar Regresión':

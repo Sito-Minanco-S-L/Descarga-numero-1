@@ -8,35 +8,32 @@ from sklearn.model_selection import train_test_split
 import sqlite3
 
 
-
+# Función para cargar archivo en formato csv
 def cargar_csv(file_name):
     df = pandas.read_csv(file_name, sep = ',')
     df_numeric = df.select_dtypes(include=[np.number])
     #print(df)
     print(df_numeric)
     return(df_numeric)    
-
+# Función para cargar archivo en formato xlsx
 def cargar_excell(file_name):
     df = pandas.read_excel(file_name)
     df_numeric = df.select_dtypes(include=[np.number])
     #print(df)
     print(df_numeric)
     return(df_numeric)
-
+# Función para cargar una base de datos
 def cargar_basededatos(file_name):
     conexion = sqlite3.connect(file_name)
     cursor = conexion.cursor()
-
 
     consulta_sql = 'SELECT * FROM california_housing_dataset'
     cursor.execute(consulta_sql)
     resultados = cursor.fetchall()
 
-
     nombres_columnas = [descripcion[0] for descripcion in cursor.description]
 
     df = pandas.DataFrame(resultados, columns=nombres_columnas)
-
 
     df_numeric = df.select_dtypes(include=[np.number])
     print(df_numeric)
@@ -44,19 +41,17 @@ def cargar_basededatos(file_name):
     conexion.close()
     return(df_numeric)
 
+# Función que contiene todas las posibles opciones del programa 
 def menu1(dfs):
     
-    print("""
-- · MENU DE OPCIONES · -
-          
--> 1: Cargar datos csv
--> 2: Cargar datos excel
--> 3: Cargar base de datos
--> 4: Mostrar archivos cargados
--> 5: Hacer regresion lineal
--> 6: Cargar modelo
--> 0: Salir del programa
-""")
+    print("""- · MENU DE OPCIONES · -
+            -> 1: Cargar datos csv
+            -> 2: Cargar datos excel
+            -> 3: Cargar base de datos
+            -> 4: Mostrar archivos cargados
+            -> 5: Hacer regresion lineal
+            -> 6: Cargar modelo
+            -> 0: Salir del programa""")
     option = int(input(": "))
 
     if option == 1:
@@ -66,7 +61,6 @@ def menu1(dfs):
         dfs[file_name] = df
         menu1(dfs)
         
-
     if option == 2:
         file_name = str(input("file_name: "))
         os.system('clear')
@@ -87,7 +81,6 @@ def menu1(dfs):
 
         menu1(dfs)
 
-    
     if option == 5:
         print("Seleciona el archivo: ")
         for i in dfs.keys():
@@ -104,7 +97,6 @@ def menu1(dfs):
         op_columna1 = int(input("\nSelecciona la variable predictora: "))
         op_columna2= int(input("\nSelecciona la variable a predecir: "))
 
-
         X = df[columnas[op_columna1]]
         Y = df[columnas[op_columna2]]
 
@@ -118,13 +110,11 @@ def menu1(dfs):
         X = df.iloc[:, op_columna1]
         Y = df.iloc[:, op_columna2 ]
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            Y,
-            test_size=0.2,
-            random_state=1234,
-            shuffle=True
-                    )
+        X_train, X_test, y_train, y_test = train_test_split(X,
+                                                            Y,
+                                                            test_size=0.2,
+                                                            random_state=1234,
+                                                            shuffle=True)
         X_train = sm.add_constant(X_train, prepend=True)
         modelo = sm.OLS(endog=y_train, exog=X_train,)
         modelo = modelo.fit()
@@ -147,10 +137,6 @@ def menu1(dfs):
         menu1(dfs)
 
 
-
-        
-    
-    
 
     
 

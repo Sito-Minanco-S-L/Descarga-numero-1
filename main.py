@@ -2,16 +2,15 @@ import os
 import csv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
-from sklearn.model_selection import train_test_split
 import sqlite3
 import PySimpleGUI as sg
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-import magic 
-import matplotlib.pyplot as plt
+import magic
 
 def file_extension(file):
     """
@@ -25,6 +24,7 @@ def file_extension(file):
     """
     L = file.split('.')
     return L[-1]
+
 
 def interpretar_r_cuadrado(r_cuadrado):
     """
@@ -54,6 +54,7 @@ def interpretar_r_cuadrado(r_cuadrado):
 
     return color, interpretacion
 
+
 def mostrar_resultados(modelo):
     """
     Muestra los resultados de un modelo de regresión lineal, incluido el R-cuadrado.
@@ -71,9 +72,17 @@ def mostrar_resultados(modelo):
 
     # Obtener R-cuadrado
     r_cuadrado = modelo.rsquared
-
+    
     # Interpretar R-cuadrado
     color, interpretacion = interpretar_r_cuadrado(r_cuadrado)
+
+    def mostrar_grafica_regresion(modelo, X, y):
+        plt.scatter(X, y, label='Datos')
+        plt.plot(X, modelo.predict(sm.add_constant(X)), color='red', label='Regresión Lineal')
+        plt.xlabel('Variable Predictora')
+        plt.ylabel('Variable a Predecir')
+        plt.legend()
+        plt.show()
 
     layout = [
         [sg.Text('Resultados de la Regresión Lineal', font=('Helvetica', 16), justification='center')],
@@ -86,16 +95,16 @@ def mostrar_resultados(modelo):
 
     while True:
         event, values = window.read()
-
         if event == sg.WINDOW_CLOSED or event == 'OK':
             break
-
         elif event == 'GUARDAR MODELO':
             modelo.save(values('--FILE--'))
 
     window.close()
-
-
+    '''
+    window = sg.Window('Gráfica de la regresión',mostrar_grafica_regresion(modelo, X, y),finalize=True)
+    window.close()
+    '''
 def regression_interface(dfs, selected_file):
     """
     Interfaz gráfica para realizar una regresión lineal.
@@ -132,13 +141,11 @@ def regression_interface(dfs, selected_file):
             X = df[predictora]
             Y = df[predecir]
 
-            X_train, X_test, y_train, y_test = train_test_split(
-                X,
-                Y,
-                test_size=0.2,
-                random_state=1234,
-                shuffle=True
-            )
+            X_train, X_test, y_train, y_test = train_test_split(X,
+                                                                Y,
+                                                                test_size=0.2,
+                                                                random_state=1234,
+                                                                shuffle=True)
             X_train = sm.add_constant(X_train, prepend=True)
             modelo = sm.OLS(endog=y_train, exog=X_train)
             modelo = modelo.fit()
@@ -170,7 +177,6 @@ def interface(dfs:dict):
         [sg.Text('Guardar Modelo de Regresión Lineal')],
         [sg.FileSaveAs(key='fig_save',file_types=(('FARLOPA', '.farlopa'),))]]
 
-    
     # Crear ventana menu
     window = sg.Window('Aplicación de Regresión', layout0, finalize=True)
 
@@ -212,8 +218,6 @@ def interface(dfs:dict):
                     dfs[selected_file] = df_numeric
                     print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
 
-                   
-
                 if extension == 'db':
                     conexion = sqlite3.connect('housing.db')
                     cursor = conexion.cursor()
@@ -227,7 +231,6 @@ def interface(dfs:dict):
                     conexion.close()
                     print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
                 
-
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
         '''
@@ -257,14 +260,12 @@ def interface(dfs:dict):
             window['Resultado'].update(f'Error Cuadrático Medio: {mse:.2f}')
             '''
 
-
         if event == 'Realizar Regresión Lineal':#PARTE DE NATHAN
             window = sg.Window('Aplicacion de regresion', [
             [sg.Text('Seleccione el archivo:', font=('Helvetica', 12), size=(25, 1)),
              sg.InputCombo(values=list(dfs.keys()), key='archivo')],
             [sg.Button('Seleccionar', size=(20, 2), button_color=('white', 'green')),
-             sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],
-        ])
+             sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],])
 
             while True:
                 event, values = window.read()
@@ -276,10 +277,8 @@ def interface(dfs:dict):
                     window.close()
                     regression_interface(dfs, selected_file)
 
-
         if event == 'Guardar Modelo':
             window = sg.Window('Aplicación de Regresión', layout2)
-
 
     # Cerrar la ventana de la interfaz gráfica al salir
     window.close()
@@ -316,7 +315,5 @@ if event == 'Submit':
 
 if __name__ == '__main__':    
     dfs = {}
-
-    #menu1(dfs)
     interface(dfs)
 

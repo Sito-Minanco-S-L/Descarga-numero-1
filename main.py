@@ -89,7 +89,7 @@ def mostrar_resultados(modelo):
         [sg.Multiline(resultados_str, size=(80, 20), font=('Courier New', 10))],
         [sg.Text(f'Bondad del ajuste: {r_cuadrado:.4f}', font=('Helvetica', 14), text_color=color)],
         [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))],
-        [sg.Button('OK', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'green')),sg.SaveAs('Guardar Modelo', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'blue'),file_types=(('FARLOPA', '.farlopa'),),default_extension=str('.farlopa'),key='--FILE--' )]]
+        [sg.Button('OK', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'green')),sg.SaveAs('Guardar Modelo', size=(10, 2), pad=((20, 0), 3), button_color=('white', 'blue'),file_types=(('FLP', '.flp'),),default_extension=str('.flp'),key='--FILE--' )]]
 
     window = sg.Window('Resultados', layout, finalize=True)
 
@@ -170,7 +170,7 @@ def interface(dfs:dict):
     
     layout1 = [
         [sg.Text('Selecciona un archivo')],
-        [sg.InputText(key='-Archivo-'),sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.InputText(key='-Archivo-'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
         [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]]
 
     layout2 = [
@@ -233,32 +233,6 @@ def interface(dfs:dict):
                 
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
-        '''
-        # ESTE IF ME PARECE Q NON SE USAAAA!!  (o siguiente e o de nathan)
-        if event == 'Realizar Regresión':##ESTO CREO Q NON SE ESTA USANDO
-            # Leer los datos del archivo seleccionado
-            archivo = values['Archivo']
-            datos = pd.read_csv(archivo)   
-            # Seleccionar las variables según los checkboxes
-            if values['Variable1']:
-                x = datos['Variable1'].values.reshape(-1, 1)
-            else:
-                x = datos['Variable2'].values.reshape(-1, 1)
-            
-            y = datos['Variable_objetivo'].values
-            # Dividir los datos en conjuntos de entrenamiento y prueba
-            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
-            # Crear un modelo de regresión lineal
-            modelo = LinearRegression()
-            # Entrenar el modelo
-            modelo.fit(x_train, y_train)
-            # Realizar predicciones en el conjunto de prueba
-            y_pred = modelo.predict(x_test)
-            # Calcular el error cuadrático medio
-            mse = mean_squared_error(y_test, y_pred)
-            # Mostrar el error cuadrático medio en la interfaz gráfica
-            window['Resultado'].update(f'Error Cuadrático Medio: {mse:.2f}')
-            '''
 
         if event == 'Realizar Regresión Lineal':#PARTE DE NATHAN
             window = sg.Window('Aplicacion de regresion', [
@@ -284,34 +258,7 @@ def interface(dfs:dict):
     window.close()
 
 
-'''
-if event == 'Submit':
-        selected_file = values['-FILENAME-']
-         #sg.popup(f'File selected: {selected_file}') #para mostrar el nombre del archivo que se selecciona.
-        try:
-            mime = magic.Magic()
-            mime_type = mime.from_file(selected_file)
 
-            if 'excel' in mime_type.lower():
-                df = pd.read_excel(selected_file)
-                file_content = df.to_string(index=False)
-                window['-FILE_CONTENT-'].update(file_content)
-            else:
-                with open(selected_file, 'r') as file:
-                    file_content = file.read()
-                window['-FILE_CONTENT-'].update(file_content)
-            num_lines = file_content.count('\n')+1
-            window['-FILE_CONTENT-'].Widget.config(height=num_lines)
-        
-        except Exception as e:
-            sg.popup_error(f'Error: {str(e)}')
-    
-    
-    if event == '-HSCROLL-':
-        scroll_value = int(values['-HSCROLL-'])
-        window['-FILE_CONTENT-'].update(file_content[scroll_value:scroll_value + 50])
-
-'''
 
 if __name__ == '__main__':    
     dfs = {}

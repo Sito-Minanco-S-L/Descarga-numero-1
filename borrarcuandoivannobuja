@@ -163,12 +163,11 @@ def interface(dfs:dict):
     
     layout1 = [
             [sg.Text('Selecciona un archivo')],
-            [sg.InputText(key='-Archivo-'), sg.FileBrowse(file_types=(("All Files", "*.*"),)),],
+            [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse(file_types=(("All Files", "*.*"),)),], #disabled 
             [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]
         ]
     
 
-    
     layout2 = [
         [sg.Text('Guardar Modelo de Regresión Lineal')],
         [sg.FileSaveAs(key='fig_save',file_types=(('txt', '.txt'),))]
@@ -182,7 +181,7 @@ def interface(dfs:dict):
 
 
     # Crear ventana menu
-    window = sg.Window('Aplicación de Regresión', layout1, finalize=True, size = (900,500))
+    window = sg.Window('Aplicación de Regresión', layout1, finalize=True)
 
     while True:
         event, values = window.read()

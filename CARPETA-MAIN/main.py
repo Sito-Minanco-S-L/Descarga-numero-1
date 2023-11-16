@@ -156,6 +156,25 @@ def regression_interface(dfs, selected_file):
 
     
 
+def create_row(name,option):
+    
+    if option == 0:
+        row = [sg.pin(
+            sg.Col([[
+                sg.Checkbox(str(name))
+            ]])
+        )]
+
+    elif option == 1:
+        row = [sg.pin(
+            sg.Col([[
+                sg.Radio(str(name), group_id='--VAR-X--')
+            ]])
+        )]
+
+    return row
+
+
 def interface(dfs:dict):
     """
     Interfaz principal que permite cargar archivos, realizar regresiones lineales y gestionar modelos.
@@ -163,35 +182,34 @@ def interface(dfs:dict):
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
     """
-    layout0 = [
-        [sg.Button('Cargar archivo')],
-        [sg.Button('Mostrar modelos')],
-        [sg.Button('Cargar modelo')]]
+    column_layout1 = [
+    [sg.Text('VARIABLES X')],
+    [sg.Text('X', size=(10,), key='-VARX-')] 
+    ]
+
+    column_layout2 = [
+        [sg.Text('VARIABLE Y')],
+        [sg.Text('Y', size=(10,), key='-VARY-')]
+    ]
+
+    column_layout3 = [
+        [sg.Text('BOTONES')],
+        [sg.Button('REALIZAR REGRESION')]
+    ]
+
+
     
-    layout1 = [
+    layout = [
         [sg.Text('Selecciona un archivo')],
-        [sg.InputText(key='-Archivo-'), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+        [sg.Column(column_layout1, key='-COL1-'), sg.Column(column_layout2, key='-COL2-'), sg.Column(column_layout3, key='-COL3-')],
         [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]]
 
-    layout2 = [
-        [sg.Text('Guardar Modelo de Regresión Lineal')],
-        [sg.FileSaveAs(key='fig_save',file_types=(('FARLOPA', '.farlopa'),))]]
+
 
     # Crear ventana menu
-    window = sg.Window('Aplicación de Regresión', layout0, finalize=True)
+    window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= True)
 
-    while True:
-        event, values = window.read()
-        if event == sg.WIN_CLOSED or event == 'Salir':
-            break
-        if event == 'Cargar archivo':
-            #ventana opcion cargar archivos
-            window = sg.Window('Aplicación de Regresión', layout1)
-            break
-        if event == 'Mostrar modelos':
-            window = sg.Window('Aplicación de Regresión', [[sg.Text('Esta merda esta sin facer')]])
-        if event == 'Cargar modelo':
-            window = sg.Window('Aplicación de Regresión', [[sg.Text('Esta merda esta sin facer')]])
 
     while True:
         event, values = window.read()
@@ -226,11 +244,16 @@ def interface(dfs:dict):
                     resultados = cursor.fetchall()
                     nombres_columnas = [descripcion[0] for descripcion in cursor.description]
                     df = pd.DataFrame(resultados, columns=nombres_columnas)
+                    
                     df_numeric = df.select_dtypes(include=[np.number])
                     dfs[selected_file] = df_numeric
                     conexion.close()
                     print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
-                
+
+                for i in dfs[selected_file].keys():                    
+                    window.extend_layout(window['-COL1-'], [create_row(i,0)])
+                    window.extend_layout(window['-COL2-'], [create_row(i,1)])
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -251,8 +274,6 @@ def interface(dfs:dict):
                     window.close()
                     regression_interface(dfs, selected_file)
 
-        if event == 'Guardar Modelo':
-            window = sg.Window('Aplicación de Regresión', layout2)
 
     # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

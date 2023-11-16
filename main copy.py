@@ -169,9 +169,10 @@ def interface(dfs:dict):
         [sg.Button('Cargar modelo')]]
     
     layout1 = [
-        [sg.Text('Selecciona un archivo')],
-        [sg.InputText(key='-Archivo-'),sg.FileBrowse(file_types=(("All Files", "*.*"),))],
-        [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]]
+            [sg.Text('Selecciona un archivo')],
+            [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse('Browse',file_types=(("All Files", "*.*"),))],
+            [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]
+        ]
 
     layout2 = [
         [sg.Text('Guardar Modelo de Regresión Lineal')],
@@ -198,7 +199,7 @@ def interface(dfs:dict):
        
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
-        if event == 'Cargar Archivo':
+        if event == 'Browse':
             selected_file = values['-Archivo-'] 
             try:
                 extension = file_extension(selected_file)
@@ -317,24 +318,3 @@ if __name__ == '__main__':
     dfs = {}
     interface(dfs)
 
-import PySimpleGUI as sg
-
-sg.theme('DarkGrey5')
-
-layout = [
-    [sg.Text('Selecciona un archivo:')],
-    [sg.Input(key='-FILE-', size=(45, 1), disabled=True), sg.FileBrowse()],
-    [sg.Button('Aceptar'), sg.Button('Cancelar')]
-]
-
-window = sg.Window('Ventana con Barra No Editable', layout, resizable=True)
-
-while True:
-    event, values = window.read()
-
-    if event == sg.WINDOW_CLOSED or event == 'Cancelar':
-        break
-    elif event == 'Aceptar':
-        sg.popup(f'Archivo seleccionado: {values["-FILE-"]}')
-
-window.close()

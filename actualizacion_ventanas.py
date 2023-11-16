@@ -1,5 +1,7 @@
 import PySimpleGUI as sg
+import pandas as pd 
 '''
+actualizar una misma ventana sin crear varias distintas 
 sg.theme('BluePurple')
 
 layout = [[sg.Text('Your typed chars appear here:'), sg.Text(size=(15,1), key='-OUTPUT-')],
@@ -59,3 +61,12 @@ while True:
         sg.popup(f'Texto ingresado: {values["-INPUT-"]}')
 
 window.close()
+
+
+'''
+# Agregar datos al diseño de la primera columna
+for i, columna in enumerate(df.columns):
+    checkbox = sg.Checkbox(columna, key=f'-CHECKBOX{i}-')
+    column_layout1.append([checkbox])
+
+'''

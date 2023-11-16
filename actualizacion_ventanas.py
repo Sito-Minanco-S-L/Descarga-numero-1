@@ -26,6 +26,27 @@ import PySimpleGUI as sg
 
 sg.theme('DarkGrey5')
 
+
+def create_row(option):
+    
+    if option == 0:
+        row = [sg.pin(
+            sg.Col([[
+                sg.Checkbox('hola'), sg.Text('Cosa de prueba')
+            ]])
+        )]
+
+    elif option == 1:
+        row = [sg.pin(
+            sg.Col([[
+                sg.Radio('prrrueba', group_id='--VAR-X--'), sg.Text('Cosa de prueba')
+            ]])
+        )]
+
+
+    return row
+
+
 # Definir el diseño de las columnas
 column_layout1 = [
     [sg.Text('VARIABLES X')],
@@ -44,11 +65,12 @@ column_layout3 = [
 # Definir el diseño de la ventana con las columnas
 layout = [
     [sg.Text('Ventana con Columnas')],
-    [sg.Column(column_layout1, key='-COL1-'), sg.Column(column_layout2, key='-COL2-'), sg.Column(column_layout3, key='-COL2-')],
+    [sg.Column(column_layout1, key='-COL1-'), sg.Column(column_layout2, key='-COL2-'), sg.Column(column_layout3, key='-COL3-')],
     [sg.Button('Aceptar'), sg.Button('Cancelar')]
 ]
 
 window = sg.Window('Ventana con Columnas', layout, resizable=True)
+
 
 while True:
     event, values = window.read()
@@ -56,7 +78,9 @@ while True:
     if event == sg.WINDOW_CLOSED or event == 'Cancelar':
         break
     elif event == 'Aceptar':
-        sg.popup('Botón Aceptar presionado')
+        window.extend_layout(window['-COL1-'], [create_row(0)])
+        window.extend_layout(window['-COL2-'], [create_row(1)])
+
     elif event == 'Enviar':
         sg.popup(f'Texto ingresado: {values["-INPUT-"]}')
 

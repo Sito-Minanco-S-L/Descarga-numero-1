@@ -182,33 +182,22 @@ def interface(dfs:dict):
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
     """
-    column_layout1 = [
-    [sg.Text('VARIABLES X')],
-    [sg.Text('X', size=(10,), key='-VARX-')] 
-    ]
+    col1 = sg.Column([[sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])]],pad=(0,0))
 
-    column_layout2 = [
-        [sg.Text('VARIABLE Y')],
-        [sg.Text('Y', size=(10,), key='-VARY-')]
-    ]
-
-    column_layout3 = [
-        [sg.Text('BOTONES')],
-        [sg.Button('REALIZAR REGRESION')]
-    ]
-
+    col2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])]],pad=(0,0))
 
     
     layout = [
         [sg.Text('Selecciona un archivo')],
         [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
-        [sg.Column(column_layout1, key='-COL1-'), sg.Column(column_layout2, key='-COL2-'), sg.Column(column_layout3, key='-COL3-')],
+        [col1],
+        [col2],
         [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]]
 
 
 
     # Crear ventana menu
-    window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= True)
+    window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
 
 
     while True:
@@ -250,10 +239,14 @@ def interface(dfs:dict):
                     conexion.close()
                     print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
 
+                listX = []
+                listY = []
                 for i in dfs[selected_file].keys():                    
-                    window.extend_layout(window['-COL1-'], [create_row(i,0)])
-                    window.extend_layout(window['-COL2-'], [create_row(i,1)])
+                    listX.append(sg.Checkbox(str(i)))
+                    listY.append(sg.Radio(str(i), group_id='--VAR_Y--'))
 
+                window.extend_layout(window['--COLX--'], [listX])
+                window.extend_layout(window['--COLY--'], [listY])
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 

@@ -22,6 +22,7 @@ def file_extension(file):
     Returns:
     - str: Extensión del archivo.
     """
+    # Divide el nombre del archivo y retorna la última parte como extensión
     L = file.split('.')
     return L[-1]
 
@@ -55,6 +56,41 @@ def interpretar_r_cuadrado(r_cuadrado):
     return color, interpretacion
 
 
+def mostrar_grafica_regresion(modelo, X, y):
+    """
+    Muestra la gráfica de la regresión lineal.
+
+    Parameters:
+    - modelo: Modelo de regresión lineal ajustado.
+    - X: Variables predictoras.
+    - y: Variable a predecir.
+
+    La función utiliza el modelo de regresión para predecir los valores y_pred. Si hay más de una variable predictora,
+    muestra una gráfica de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
+    muestra la gráfica de dispersión junto con la regresión lineal.
+
+    Returns:
+    - None
+    """
+    # Predice los valores
+    y_pred = modelo.predict(sm.add_constant(X))
+    # Verifica si hay más de una variable predictora
+    if X.shape[1] > 1:
+        # Si hay más de una variable predictora, no se puede graficar en 2D, así que muestra solo la predicción vs. observado
+        plt.scatter(y, y_pred, label='Observado vs. Predicho')
+        plt.xlabel('Observado')
+        plt.ylabel('Predicho')
+    else:
+        # Si solo hay una variable predictora, muestra la gráfica de dispersión y la regresión lineal
+        plt.scatter(X.iloc[:, 1], y, label='Datos')
+        plt.plot(X.iloc[:, 1], y_pred, color='red', label='Regresión Lineal')
+        plt.xlabel('Variable Predictora')
+        plt.ylabel('Variable a Predecir')
+
+    plt.legend()
+    plt.show()
+
+
 def mostrar_resultados(modelo):
     """
     Muestra los resultados de un modelo de regresión lineal, incluido el R-cuadrado.
@@ -62,6 +98,7 @@ def mostrar_resultados(modelo):
     Parameters:
     - modelo: Modelo de regresión lineal ajustado.
     """
+    # Obtiene los resultados del modelo y los muestra en una ventana gráfica
     resultados = modelo.summary()
     resultados_str = str(resultados)
     resultados_list = resultados_str.split('\n')
@@ -75,14 +112,6 @@ def mostrar_resultados(modelo):
     
     # Interpretar R-cuadrado
     color, interpretacion = interpretar_r_cuadrado(r_cuadrado)
-
-    def mostrar_grafica_regresion(modelo, X, y):
-        plt.scatter(X, y, label='Datos')
-        plt.plot(X, modelo.predict(sm.add_constant(X)), color='red', label='Regresión Lineal')
-        plt.xlabel('Variable Predictora')
-        plt.ylabel('Variable a Predecir')
-        plt.legend()
-        plt.show()
 
     layout = [
         [sg.Text('Resultados de la Regresión Lineal', font=('Helvetica', 16), justification='center')],
@@ -102,12 +131,13 @@ def mostrar_resultados(modelo):
 
     window.close()
     '''
-    window = sg.Window('Gráfica de la regresión',mostrar_grafica_regresion(modelo, X, y),finalize=True)
+    window = sg.Window('Gráfica de la regresión',mostrar_grafica_regresion(modelo, X, Y),finalize=True)
     window.close()
     '''
+
 def regression_interface(dfs, selected_file):
     """
-    Interfaz gráfica para realizar una regresión lineal.
+    Interfaz gráfica para realizar una regresión lineal múltiple.
 
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
@@ -119,15 +149,16 @@ def regression_interface(dfs, selected_file):
     sg.theme('DarkGrey2')
 
     layout = [
-        [sg.Text('Regresión Lineal', font=('Helvetica', 20), justification='center')],
-        [sg.Text('Seleccione la variable predictora:', font=('Helvetica', 12), size=(25, 1)),
-         sg.InputCombo(values=columnas, key='predictora')],
+        [sg.Text('Regresión Lineal Múltiple', font=('Helvetica', 20), justification='center')],
+        [sg.Text('Seleccione las variables predictoras:', font=('Helvetica', 12), size=(25, 1)),
+         sg.InputCombo(values=columnas, key='predictoras')],
         [sg.Text('Seleccione la variable a predecir:', font=('Helvetica', 12), size=(25, 1)),
          sg.InputCombo(values=columnas, key='predecir')],
         [sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green')),
-         sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],]
+         sg.Button('Salir', size=(20, 2), button_color=('white', 'red'))],
+    ]
 
-    window = sg.Window('Regresión Lineal', layout, finalize=True)
+    window = sg.Window('Regresión Lineal Múltiple', layout, finalize=True)
 
     while True:
         event, values = window.read()
@@ -135,10 +166,10 @@ def regression_interface(dfs, selected_file):
         if event == sg.WINDOW_CLOSED or event == 'Salir':
             break
         elif event == 'Realizar Regresión Lineal':
-            predictora = values['predictora']
+            predictoras = values['predictoras']
             predecir = values['predecir']
 
-            X = df[predictora]
+            X = df[predictoras]
             Y = df[predecir]
 
             X_train, X_test, y_train, y_test = train_test_split(X,
@@ -157,20 +188,21 @@ def regression_interface(dfs, selected_file):
     
 
 def create_row(name,option):
-    
+    """
+    Crea una fila con un checkbox o un radio button.
+
+    Parameters:
+    - name (str): Nombre del elemento.
+    - option (int): Opción para determinar el tipo de elemento (0 para checkbox, 1 para radio button).
+
+    Returns:
+    - List: Lista que representa la fila.
+    """
     if option == 0:
-        row = [sg.pin(
-            sg.Col([[
-                sg.Checkbox(str(name))
-            ]])
-        )]
+        row = [sg.pin(sg.Col([[sg.Checkbox(str(name))]]))]
 
     elif option == 1:
-        row = [sg.pin(
-            sg.Col([[
-                sg.Radio(str(name), group_id='--VAR-X--')
-            ]])
-        )]
+        row = [sg.pin(sg.Col([[sg.Radio(str(name), group_id='--VAR-X--')]]))]
 
     return row
 
@@ -182,29 +214,25 @@ def interface(dfs:dict):
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
     """
-    column_layout1 = [
-    [sg.Text('VARIABLES X')],
-    [sg.Text('X', size=(10,), key='-VARX-')] 
+    # Layout de las columnas para mostrar las variables X, Y y los botones    
+    column_layout1 = [[sg.Text('VARIABLES X')],
+                      [sg.Text('X', size=(10,), key='-VARX-')] 
     ]
 
-    column_layout2 = [
-        [sg.Text('VARIABLE Y')],
-        [sg.Text('Y', size=(10,), key='-VARY-')]
+    column_layout2 = [[sg.Text('VARIABLE Y')],
+                      [sg.Text('Y', size=(10,), key='-VARY-')]
     ]
 
-    column_layout3 = [
-        [sg.Text('BOTONES')],
-        [sg.Button('REALIZAR REGRESION')]
+    column_layout3 = [[sg.Text('BOTONES')],
+                      [sg.Button('REALIZAR REGRESION')]
     ]
 
-
-    
+    # Layout principal de la interfaz
     layout = [
         [sg.Text('Selecciona un archivo')],
         [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
         [sg.Column(column_layout1, key='-COL1-'), sg.Column(column_layout2, key='-COL2-'), sg.Column(column_layout3, key='-COL3-')],
         [sg.Button('Cargar Archivo'), sg.Button('Realizar Regresión Lineal'), sg.Button('Salir')]]
-
 
 
     # Crear ventana menu
@@ -213,13 +241,16 @@ def interface(dfs:dict):
 
     while True:
         event, values = window.read()
-       
+        # Salir de la aplicación si se cierra la ventana o se presiona el botón 'Salir'
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
+        # Cargar archivo si se presiona el botón 'Cargar Archivo'
         if event == 'Cargar Archivo':
             selected_file = values['-Archivo-'] 
             try:
+                # Obtener la extensión del archivo                
                 extension = file_extension(selected_file)
+                # Leer el archivo según la extensión y cargarlo en un DataFrame
                 if extension == 'xlsx':
                     df = pd.read_excel(selected_file)
                     df_numeric = df.select_dtypes(include=[np.number])
@@ -250,6 +281,7 @@ def interface(dfs:dict):
                     conexion.close()
                     print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
 
+                # Actualizar las columnas de variables X e Y en la interfaz
                 for i in dfs[selected_file].keys():                    
                     window.extend_layout(window['-COL1-'], [create_row(i,0)])
                     window.extend_layout(window['-COL2-'], [create_row(i,1)])
@@ -257,6 +289,7 @@ def interface(dfs:dict):
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
+        # Abrir la interfaz para realizar la regresión lineal si se presiona el botón 'Realizar Regresión Lineal'
         if event == 'Realizar Regresión Lineal':#PARTE DE NATHAN
             window = sg.Window('Aplicacion de regresion', [
             [sg.Text('Seleccione el archivo:', font=('Helvetica', 12), size=(25, 1)),
@@ -266,9 +299,10 @@ def interface(dfs:dict):
 
             while True:
                 event, values = window.read()
-
+                # Salir de la ventana de selección si se cierra la ventana o se presiona el botón 'Salir'
                 if event == sg.WINDOW_CLOSED or event == 'Salir':
                     break
+                # Abrir la interfaz de regresión lineal si se presiona el botón 'Seleccionar'
                 elif event == 'Seleccionar':
                     selected_file = values['archivo']
                     window.close()

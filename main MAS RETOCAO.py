@@ -70,17 +70,21 @@ def mostrar_grafica_regresion(modelo, X, y):
     - None
     """
     # Predice los valores
-    y_pred = modelo.predict(sm.add_constant(X))
+    X_with_const = sm.add_constant(X)
+    y_pred = modelo.predict(X_with_const)
+    
     # Verifica si hay más de una variable predictora
     if X.shape[1] > 1:
-        # Si hay más de una variable predictora, no se puede graficar en 2D, así que muestra solo la predicción vs. observado
+        # Si hay más de una variable predictora, no se puede graficar en 2D,
+        # así que muestra solo la predicción vs. observado
         plt.scatter(y, y_pred, label='Observado vs. Predicho')
         plt.xlabel('Observado')
         plt.ylabel('Predicho')
     else:
-        # Si solo hay una variable predictora, muestra la gráfica de dispersión y la regresión lineal
-        plt.scatter(X.iloc[:, 1], y, label='Datos')
-        plt.plot(X.iloc[:, 1], y_pred, color='red', label='Regresión Lineal')
+        # Si solo hay una variable predictora, muestra la gráfica de dispersión,
+        # y la regresión lineal
+        plt.scatter(X.iloc[:, 0], y, label='Datos')
+        plt.plot(X.iloc[:, 0], y_pred, color='red', label='Regresión Lineal')
         plt.xlabel('Variable Predictora')
         plt.ylabel('Variable a Predecir')
 
@@ -91,20 +95,24 @@ def mostrar_grafica_regresion(modelo, X, y):
 ## ESTA FUNCION FIXENA COPIANDO UN CACHO DO CODIGO DE NATHAN
 ## ALCULA COUSAS E MOSTRA COUSAS POR PANTALLA UNHA VEZ ESTA FEITO 
 ## O MODELO, FACIAME FALTA PA CANDO SE CARGASE O MODELO, ENTONCES CONVERTINO NUNHA FUNCION
-def cosas_regresion(modelo,window):
+def cosas_regresion(modelo, window, X, y):
     r_squared = modelo.rsquared
     color, interpretacion = interpretar_r_cuadrado(r_squared)
 
     resultados = modelo.summary()
     resultados_str = str(resultados)
     window['-OUTPUT-'].update(value=resultados_str)
+    
     layout_resultados = [
-    [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
-    [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
+        [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
+        [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
     ]
     window_resultados = sg.Window('Resultados del Modelo', layout_resultados)
     event, values = window_resultados.read()
     window_resultados.close()
+
+    # Muestra la gráfica de regresión lineal
+    mostrar_grafica_regresion(modelo, X, y)
 
 def create_row(name,option):
     """
@@ -248,10 +256,10 @@ def interface(dfs:dict):
                                                                     test_size=0.2,
                                                                     random_state=1234,
                                                                     shuffle=True)
-                X_train = sm.add_constant(X_train)  # No es necesario prepend=True en add_constant para statsmodels >= 0.11
+                X_train = sm.add_constant(X_train)
                 modelo = sm.OLS(endog=y_train, exog=X_train)
                 modelo = modelo.fit()
-                cosas_regresion(modelo, window)
+                cosas_regresion(modelo, window, X_train, y_train)
 
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])

@@ -150,7 +150,7 @@ def interface(dfs:dict):
     [sg.InputText(key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
     [col1],
     [col2],
-    [sg.Multiline(size=(80, 20), key='-OUTPUT-', autoscroll=True, font=('Courier New', 10))],
+    [sg.Frame('',[],key='--TABLA--')],
     [sg.Frame('',[[
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green')),
         sg.Button('Salir', size=(20, 2), button_color=('white', 'red')),
@@ -224,6 +224,10 @@ def interface(dfs:dict):
                 window.extend_layout(window['--COLX--'], [listX])
                 window.extend_layout(window['--COLY--'], [listY])
 
+                table_data = dfs[selected_file].to_numpy().tolist()
+                table_headings = dfs[selected_file].columns.tolist()
+                window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -260,7 +264,7 @@ def interface(dfs:dict):
                 modelo = modelo.fit()
                 cosas_regresion(modelo, window)
                 # Muestra la gráfica de regresión lineal
-                mostrar_grafica_regresion(modelo, X,y)
+                mostrar_grafica_regresion(modelo, X,Y)
 
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])
@@ -270,7 +274,7 @@ def interface(dfs:dict):
             modelo = sm.load(selected_model)
             cosas_regresion(modelo, window)
             #Muestra la gráfica de regresión lineal
-            mostrar_grafica_regresion(modelo, X, y)
+            mostrar_grafica_regresion(modelo, X, Y)
 
                 
             

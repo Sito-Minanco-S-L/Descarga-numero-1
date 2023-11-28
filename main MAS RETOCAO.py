@@ -146,8 +146,7 @@ def interface(dfs:dict):
     
 
     layout = [
-    [sg.Text('Selecciona un archivo')],
-    [sg.InputText(key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+    [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
     [col1],
     [col2],
     [sg.Frame('',[],key='--TABLA--')],

@@ -95,7 +95,7 @@ def mostrar_grafica_regresion(modelo, X, y):
 ## ESTA FUNCION FIXENA COPIANDO UN CACHO DO CODIGO DE NATHAN
 ## ALCULA COUSAS E MOSTRA COUSAS POR PANTALLA UNHA VEZ ESTA FEITO 
 ## O MODELO, FACIAME FALTA PA CANDO SE CARGASE O MODELO, ENTONCES CONVERTINO NUNHA FUNCION
-def cosas_regresion(modelo, window, X, y):
+def cosas_regresion(modelo, window):
     r_squared = modelo.rsquared
     color, interpretacion = interpretar_r_cuadrado(r_squared)
 
@@ -111,8 +111,7 @@ def cosas_regresion(modelo, window, X, y):
     event, values = window_resultados.read()
     window_resultados.close()
 
-    # Muestra la gráfica de regresión lineal
-    mostrar_grafica_regresion(modelo, X, y)
+
 
 def create_row(name,option):
     """
@@ -148,11 +147,11 @@ def interface(dfs:dict):
 
     layout = [
     [sg.Text('Selecciona un archivo')],
-    [sg.InputText(key='-Archivo-', disabled=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
+    [sg.InputText(key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("All Files", "*.*"),))],
     [col1],
     [col2],
     [sg.Multiline(size=(80, 20), key='-OUTPUT-', autoscroll=True, font=('Courier New', 10))],
-    [sg.Frame('',[[sg.Button('Cargar Archivo', size=(20, 2)),
+    [sg.Frame('',[[
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green')),
         sg.Button('Salir', size=(20, 2), button_color=('white', 'red')),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
@@ -176,7 +175,7 @@ def interface(dfs:dict):
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
         # Cargar archivo si se presiona el botón 'Cargar Archivo'
-        if event == 'Cargar Archivo':
+        if event == '-Archivo-':
             selected_file = values['-Archivo-'] 
             try:
                 # Obtener la extensión del archivo                
@@ -259,7 +258,9 @@ def interface(dfs:dict):
                 X_train = sm.add_constant(X_train)
                 modelo = sm.OLS(endog=y_train, exog=X_train)
                 modelo = modelo.fit()
-                cosas_regresion(modelo, window, X_train, y_train)
+                cosas_regresion(modelo, window)
+                # Muestra la gráfica de regresión lineal
+                mostrar_grafica_regresion(modelo, X,y)
 
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])
@@ -268,6 +269,8 @@ def interface(dfs:dict):
             selected_model = values['--MODELO--'] 
             modelo = sm.load(selected_model)
             cosas_regresion(modelo, window)
+            #Muestra la gráfica de regresión lineal
+            mostrar_grafica_regresion(modelo, X, y)
 
                 
             

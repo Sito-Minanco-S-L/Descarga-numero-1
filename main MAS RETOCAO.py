@@ -101,7 +101,7 @@ def cosas_regresion(modelo, window):
 
     resultados = modelo.summary()
     resultados_str = str(resultados)
-    window['-OUTPUT-'].update(value=resultados_str)
+    #window['-OUTPUT-'].update(value=resultados_str)
     
     layout_resultados = [
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],

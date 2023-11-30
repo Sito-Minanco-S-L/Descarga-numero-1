@@ -45,7 +45,7 @@ def interface(dfs:dict):
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green')),
         sg.Button('Salir', size=(20, 2), button_color=('white', 'red')),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
-        sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), enable_events=True, default_extension=".flp"),
+        sg.FileSaveAs('Guardar Modelo', size=(20,2), button_color=('white', 'blue'), enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
         sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), file_types='.flp', enable_events=True)
       ]])]

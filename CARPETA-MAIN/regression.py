@@ -75,12 +75,13 @@ def mostrar_grafica_regresion(modelo, X, y):
 def cosas_regresion(modelo):
     r_squared = modelo.rsquared
     color, interpretacion = interpretar_r_cuadrado(r_squared)
-        
+
     layout_resultados = [
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
         [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
     ]
     window_resultados = sg.Window('Resultados del Modelo', layout_resultados)
+    event, values = window_resultados.read()
     window_resultados.close()
 
 

@@ -225,9 +225,12 @@ def interface(dfs:dict):
                 window['-Regresion-'].update(visible=True)
                 
                 window['-Salir-'].update(visible=True)
+
                 table_data = dfs[selected_file].to_numpy().tolist()
                 table_headings = dfs[selected_file].columns.tolist()
                 window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
+
+                event, values = window.read()
 
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')

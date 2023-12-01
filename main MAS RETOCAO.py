@@ -146,17 +146,22 @@ def interface(dfs:dict):
     
 
     layout = [
-    [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV", "*.csv"), ("Archivos Excel", "*.xlsx"), ("Archivos de Base de Datos", "*.db"),))],
+    [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV y Excel y Base de Datos", "*.csv;*.xlsx;*.db"),))],
     [col1],
     [col2],
     [sg.Frame('',[],key='--TABLA--')],
     [sg.Frame('',[[
-        sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False, key='-Regresion-'),
-        sg.Button('Salir', size=(20, 2), button_color=('white', 'red'), visible=False, key='-Salir-'),
+        sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
+        sg.Button('Salir', size=(20, 2), button_color=('white', 'red'), visible=False),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='1'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='2'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='3'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='4'),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
-        sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, key='-Guardar-', enable_events=True, default_extension=".flp"),
+        sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
-        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=False, key='-Cargar-', file_types='.flp', enable_events=True)
+        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=False, file_types='.flp', enable_events=True)
+
       ]])]
     ]
 
@@ -229,14 +234,27 @@ def interface(dfs:dict):
                 table_data = dfs[selected_file].to_numpy().tolist()
                 table_headings = dfs[selected_file].columns.tolist()
                 window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
+                if window['1'].visible:
+                    window['Realizar Regresión Lineal'].update(visible=True)
+                    window['1'].update(visible=False)
+                if window['2'].visible:
+                    window['2'].update(visible=False)
+                    window['2'].update(visible=True)
 
-                event, values = window.read()
+                window['Cargar Modelo'].update(visible=True)
+                window['3'].update(visible=False)
 
+                window['Salir'].update(visible=True)
+                window['4'].update(visible=False)
+        
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
         # Abrir la interfaz para realizar la regresión lineal si se presiona el botón 'Realizar Regresión Lineal'
-
+        
+        
+                
+        
         if event == 'Realizar Regresión Lineal':
             selected_X = [key for key, value in values.items() if value is True and key != '--VAR Y--']
             selected_Y = selected_X[-1] - len(dfs[selected_file].columns)
@@ -269,7 +287,17 @@ def interface(dfs:dict):
                 cosas_regresion(modelo, window)
                 # Muestra la gráfica de regresión lineal
                 mostrar_grafica_regresion(modelo, X,Y)
-                
+
+            window['Salir'].update(visible=False)
+            window['Cargar Modelo'].update(visible=False)
+
+            window['Guardar'].update(visible=True)
+            window['2'].update(visible=False)
+
+            window['Cargar Modelo'].update(visible=True)
+            
+            window['Salir'].update(visible=True)
+
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])
 
@@ -279,7 +307,16 @@ def interface(dfs:dict):
             cosas_regresion(modelo, window)
             #Muestra la gráfica de regresión lineal
             mostrar_grafica_regresion(modelo, X, Y)
-        window['-Cargar-'].update(visible=True)
+
+   
+
+        
+        
+        
+        
+
+
+
                 
             
 

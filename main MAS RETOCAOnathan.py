@@ -8,6 +8,23 @@ import PySimpleGUI as sg
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from PIL import Image, ImageDraw, ImageFont
+
+def convert_text_to_image(text):
+    # Configuración de la imagen
+    img = Image.new('RGB', (800, 600), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
+    font_size = 18
+    font = ImageFont.truetype("arial.ttf", font_size)
+
+    # Agregar el texto al lienzo de la imagen
+    d.text((10, 10), text, fill=(0, 0, 0), font=font)
+
+    # Guardar la imagen temporalmente
+    img_path = 'summary_image.png'
+    img.save(img_path)
+    return img_path
+
 
 def file_extension(file):
     """
@@ -92,7 +109,10 @@ def mostrar_grafica_regresion(modelo, X, y, window):
         ax.set_ylabel('Variable a Predecir')
 
     ax.legend()
-    
+
+    # Ajustar el tamaño de la figura
+    fig.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
+
     # Guardar la gráfica en un archivo temporal
     temp_plot = 'temp_plot.png'
     plt.savefig(temp_plot)
@@ -102,8 +122,8 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     with open(temp_plot, "rb") as file:
         img_bytes = file.read()
     
-    # Update the image element in the window with the new image bytes
-    window['-IMAGE-'].update(data=img_bytes)
+    # Actualizar el elemento de imagen en la ventana con los nuevos bytes de la imagen
+    window['-IMAGE2-'].update(data=img_bytes)
 
 
 
@@ -117,6 +137,13 @@ def cosas_regresion(modelo, window):
     resultados = modelo.summary()
     resultados_str = str(resultados)
     #window['-OUTPUT-'].update(value=resultados_str)
+    img_path = convert_text_to_image(resultados_str)
+    img = Image.open(img_path)
+    img = img.resize((700, 400))  # Ajusta el tamaño de la imagen
+    img.save(img_path)
+
+    # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada
+    window['-IMAGE1-'].update(filename=img_path)
     
     layout_resultados = [
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
@@ -160,25 +187,28 @@ def interface(dfs:dict):
     col2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])]],pad=(0,0))
 
     layout = [
-    [sg.InputText(default_text='Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV", "*.csv"), ("Archivos Excel", "*.xlsx"), ("Archivos de Base de Datos", "*.db"),))],
+    [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV y Excel y Base de Datos", "*.csv;*.xlsx;*.db"),))],
     [sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])],
     [sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])],
     [sg.Frame('',[],key='--TABLA--')],
-    [sg.Column([[sg.Image(key='-IMAGE-', size=(50, 50))]], justification='center')],
+    [sg.Column([
+        [sg.Image(key='-IMAGE1-', size=(300, 200)), sg.Image(key='-IMAGE2-', size=(300, 200))]
+    ], justification='center')],
+
     [sg.Frame('',[[
-        sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green')),
-        sg.Button('Salir', size=(20, 2), button_color=('white', 'red')),
+        sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
+        sg.Button('Salir', size=(20, 2), button_color=('white', 'red'), visible=False),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='1'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='2'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='3'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='4'),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
-        sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), enable_events=True, default_extension=".flp"),
+        sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
-        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), file_types='.flp', enable_events=True)
+        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=False, file_types='.flp', enable_events=True)
+
       ]])]
     ]
-
-
-
-    
-
 
 
     # Crear ventana menu
@@ -244,6 +274,19 @@ def interface(dfs:dict):
                 table_headings = dfs[selected_file].columns.tolist()
                 window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
 
+                if window['1'].visible:
+                    window['Realizar Regresión Lineal'].update(visible=True)
+                    window['1'].update(visible=False)
+                if window['2'].visible:
+                    window['2'].update(visible=False)
+                    window['2'].update(visible=True)
+
+                window['Cargar Modelo'].update(visible=True)
+                window['3'].update(visible=False)
+
+                window['Salir'].update(visible=True)
+                window['4'].update(visible=False)
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -278,9 +321,20 @@ def interface(dfs:dict):
                 X_train = sm.add_constant(X_train)
                 modelo = sm.OLS(endog=y_train, exog=X_train)
                 modelo = modelo.fit()
-                cosas_regresion(modelo, window)
                 # Muestra la gráfica de regresión lineal
                 mostrar_grafica_regresion(modelo, X,Y, window)
+                cosas_regresion(modelo, window)
+
+            window['Salir'].update(visible=False)
+            window['Cargar Modelo'].update(visible=False)
+
+            window['Guardar'].update(visible=True)
+            window['2'].update(visible=False)
+
+            window['Cargar Modelo'].update(visible=True)
+            
+            window['Salir'].update(visible=True)
+
 
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])

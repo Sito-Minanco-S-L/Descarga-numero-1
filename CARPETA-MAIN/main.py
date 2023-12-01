@@ -1,11 +1,29 @@
-import PySimpleGUI as sg
-import statsmodels.api as sm
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
 import sqlite3
+import PySimpleGUI as sg
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-import regression
+from sklearn.metrics import mean_squared_error
+from PIL import Image, ImageDraw, ImageFont
 
+def convert_text_to_image(text):
+    # Configuración de la imagen
+    img = Image.new('RGB', (800, 600), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
+    font_size = 18
+    font = ImageFont.truetype("arial.ttf", font_size)
+
+    # Agregar el texto al lienzo de la imagen
+    d.text((10, 10), text, fill=(0, 0, 0), font=font)
+
+    # Guardar la imagen temporalmente
+    img_path = 'summary_image.png'
+    img.save(img_path)
+    return img_path
 
 
 def file_extension(file):
@@ -23,6 +41,139 @@ def file_extension(file):
     return L[-1]
 
 
+def interpretar_r_cuadrado(r_cuadrado):
+    """
+    Interpreta el valor de R-cuadrado y devuelve el color y la interpretación correspondientes.
+
+    Parameters:
+    - r_cuadrado (float): Valor de R-cuadrado.
+
+    Returns:
+    - Tuple: (str) Color para visualización, (str) Interpretación del R-cuadrado.
+    """
+    if 0.8 <= r_cuadrado <= 1:
+        color = 'green'
+        interpretacion = 'Ajuste óptimo, el modelo explica a la perfección la relación de las variables'
+    elif 0.6 <= r_cuadrado < 0.8:
+        color = 'yellow'
+        interpretacion = 'Buen Ajuste'
+    elif 0.4 <= r_cuadrado < 0.6:
+        color = 'yellow'
+        interpretacion = 'Ajuste Aceptable'
+    elif 0.2 <= r_cuadrado < 0.4:
+        color = 'red'
+        interpretacion = 'Ajuste Débil'
+    else:
+        color = 'red'
+        interpretacion = 'Ajuste Pésimo, el modelo no es explicativo'
+
+    return color, interpretacion
+
+def mostrar_grafica_regresion(modelo, X, y, window):
+    """
+    Muestra la gráfica de la regresión lineal.
+
+    Parameters:
+    - modelo: Modelo de regresión lineal ajustado.
+    - X: Variables predictoras.
+    - y: Variable a predecir.
+    - window: Ventana de la interfaz gráfica donde se mostrará la gráfica.
+
+    La función utiliza el modelo de regresión para predecir los valores y_pred. Si hay más de una variable predictora,
+    muestra una gráfica de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
+    muestra la gráfica de dispersión junto con la regresión lineal.
+
+    Returns:
+    - None
+    """
+    # Predice los valores
+    X_with_const = sm.add_constant(X)
+    y_pred = modelo.predict(X_with_const)
+
+    # Crear la figura para la gráfica
+    fig, ax = plt.subplots()
+    
+    # Verifica si hay más de una variable predictora
+    if X.shape[1] > 1:
+        # Si hay más de una variable predictora, no se puede graficar en 2D,
+        # así que muestra solo la predicción vs. observado
+        ax.scatter(y, y_pred, label='Observado vs. Predicho')
+        ax.set_xlabel('Observado')
+        ax.set_ylabel('Predicho')
+    else:
+        # Si solo hay una variable predictora, muestra la gráfica de dispersión,
+        # y la regresión lineal
+        ax.scatter(X.iloc[:, 0], y, label='Datos')
+        ax.plot(X.iloc[:, 0], y_pred, color='red', label='Regresión Lineal')
+        ax.set_xlabel('Variable Predictora')
+        ax.set_ylabel('Variable a Predecir')
+
+    ax.legend()
+
+    # Ajustar el tamaño de la figura
+    fig.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
+
+    # Guardar la gráfica en un archivo temporal
+    temp_plot = 'temp_plot.png'
+    plt.savefig(temp_plot)
+    plt.close()
+
+    # Mostrar la gráfica en la interfaz
+    with open(temp_plot, "rb") as file:
+        img_bytes = file.read()
+    
+    # Actualizar el elemento de imagen en la ventana con los nuevos bytes de la imagen
+    window['-IMAGE2-'].update(data=img_bytes)
+
+
+
+## ESTA FUNCION FIXENA COPIANDO UN CACHO DO CODIGO DE NATHAN
+## ALCULA COUSAS E MOSTRA COUSAS POR PANTALLA UNHA VEZ ESTA FEITO 
+## O MODELO, FACIAME FALTA PA CANDO SE CARGASE O MODELO, ENTONCES CONVERTINO NUNHA FUNCION
+def cosas_regresion(modelo, window):
+    r_squared = modelo.rsquared
+    color, interpretacion = interpretar_r_cuadrado(r_squared)
+
+    resultados = modelo.summary()
+    resultados_str = str(resultados)
+    #window['-OUTPUT-'].update(value=resultados_str)
+    img_path = convert_text_to_image(resultados_str)
+    img = Image.open(img_path)
+    img = img.resize((700, 400))  # Ajusta el tamaño de la imagen
+    img.save(img_path)
+
+    # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada
+    window['-IMAGE1-'].update(filename=img_path)
+    
+    layout_resultados = [
+        [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
+        [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
+    ]
+    window_resultados = sg.Window('Resultados del Modelo', layout_resultados)
+    event, values = window_resultados.read()
+    window_resultados.close()
+
+
+
+def create_row(name,option):
+    """
+    Crea una fila con un checkbox o un radio button.
+
+    Parameters:
+    - name (str): Nombre del elemento.
+    - option (int): Opción para determinar el tipo de elemento (0 para checkbox, 1 para radio button).
+
+    Returns:
+    - List: Lista que representa la fila.
+    """
+    if option == 0:
+        row = [sg.pin(sg.Col([[sg.Checkbox(str(name))]]))]
+
+    elif option == 1:
+        row = [sg.pin(sg.Col([[sg.Radio(str(name), group_id='--VAR-X--')]]))]
+
+    return row
+
 
 def interface(dfs:dict):
     """
@@ -34,13 +185,16 @@ def interface(dfs:dict):
     col1 = sg.Column([[sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])]],pad=(0,0))
 
     col2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])]],pad=(0,0))
-    
 
     layout = [
     [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV y Excel y Base de Datos", "*.csv;*.xlsx;*.db"),))],
-    [col1],
-    [col2],
+    [sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])],
+    [sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])],
     [sg.Frame('',[],key='--TABLA--')],
+    [sg.Column([
+        [sg.Image(key='-IMAGE1-', size=(300, 200)), sg.Image(key='-IMAGE2-', size=(300, 200))]
+    ], justification='center')],
+
     [sg.Frame('',[[
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
         sg.Button('Salir', size=(20, 2), button_color=('white', 'red'), visible=False),
@@ -55,9 +209,6 @@ def interface(dfs:dict):
 
       ]])]
     ]
-
-    
-
 
 
     # Crear ventana menu
@@ -135,7 +286,7 @@ def interface(dfs:dict):
 
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
-        
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -170,10 +321,9 @@ def interface(dfs:dict):
                 X_train = sm.add_constant(X_train)
                 modelo = sm.OLS(endog=y_train, exog=X_train)
                 modelo = modelo.fit()
-                regression.cosas_regresion(modelo)
                 # Muestra la gráfica de regresión lineal
-                regression.mostrar_grafica_regresion(modelo, X,Y)
-                 
+                mostrar_grafica_regresion(modelo, X,Y, window)
+                cosas_regresion(modelo, window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -186,16 +336,15 @@ def interface(dfs:dict):
             window['Salir'].update(visible=True)
 
 
-
         if event == '--FILENAME--':
             modelo.save(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = sm.load(selected_model)
-            regression.cosas_regresion(modelo)
+            cosas_regresion(modelo, window)
             #Muestra la gráfica de regresión lineal
-            regression.mostrar_grafica_regresion(modelo, X, Y)
+            mostrar_grafica_regresion(modelo, X, Y, window)
 
                 
             

@@ -227,9 +227,7 @@ def interface(dfs:dict):
 
                 window.extend_layout(window['--COLX--'], [listX])
                 window.extend_layout(window['--COLY--'], [listY])
-                window['-Regresion-'].update(visible=True)
-                
-                window['-Salir-'].update(visible=True)
+
 
                 table_data = dfs[selected_file].to_numpy().tolist()
                 table_headings = dfs[selected_file].columns.tolist()

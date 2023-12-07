@@ -9,27 +9,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 #from sklearn.metrics import mean_squared_error
 import regression
-
-
-def file_extension(file):
-    """
-    Obtiene la extensión de un archivo a partir de su nombre.
-
-    Parameters:
-    - file (str): Nombre del archivo.
-
-    Returns:
-    - str: Extensión del archivo.
-    """
-    # Divide el nombre del archivo y retorna la última parte como extensión
-    L = file.split('.')
-    return L[-1]
-
-
-
-
-
-
+import files
 
 def interface(dfs:dict):
     """
@@ -81,38 +61,18 @@ def interface(dfs:dict):
             selected_file = values['-Archivo-'] 
             try:
                 # Obtener la extensión del archivo                
-                extension = file_extension(selected_file)
-                # Leer el archivo según la extensión y cargarlo en un DataFrame
-                if extension == 'xlsx':
-                    df = pd.read_excel(selected_file)
-                    df_numeric = df.select_dtypes(include=[np.number])
-                    file_content = df_numeric.to_string(index=False)
-                    dfs[selected_file] = df_numeric
-                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
-                    #window['-FILE_CONTENT-'].update(file_content)
+                extension = files.file_extension(selected_file)
                 
+                # Leer el archivo según la extensión y cargarlo en un DataFrame 
+                if extension == 'xlsx':
+                    files.read_xlsx(selected_file, dfs)
+                  
                 if extension == 'csv':
-                    #print('hola')
-                    df = pd.read_csv(selected_file)
-                    df_numeric = df.select_dtypes(include=[np.number])
-                    file_content = df_numeric.to_string(index=False)
-                    dfs[selected_file] = df_numeric
-                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
-
+                    files.reald_csv(selected_file, dfs)
+                 
                 if extension == 'db':
-                    conexion = sqlite3.connect('housing.db')
-                    cursor = conexion.cursor()
-                    consulta_sql = 'SELECT * FROM california_housing_dataset'
-                    cursor.execute(consulta_sql)
-                    resultados = cursor.fetchall()
-                    nombres_columnas = [descripcion[0] for descripcion in cursor.description]
-                    df = pd.DataFrame(resultados, columns=nombres_columnas)
+                    files.read_database(selected_file, dfs)
                     
-                    df_numeric = df.select_dtypes(include=[np.number])
-                    dfs[selected_file] = df_numeric
-                    conexion.close()
-                    print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
-
                 listX = []
                 listY = []
                 lista_columnas = []
@@ -202,16 +162,8 @@ def interface(dfs:dict):
             #Muestra la gráfica de regresión lineal
             regression.mostrar_grafica_regresion(modelo, X, Y, window)
 
-                
-
-
-
+# Cerrar la ventana de la interfaz gráfica al salir
     window.close()
-
-
-    # Cerrar la ventana de la interfaz gráfica al salir
-
-
 
 
 if __name__ == '__main__':    

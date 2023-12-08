@@ -63,16 +63,12 @@ def interface(dfs:dict):
                 # Obtener la extensión del archivo                
                 extension = files.file_extension(selected_file)
                 
+                #testing
+                assert extension == 'xlsx' or extension == 'csv' or extension == 'db', "El archivo no tiene un formato adecuado (.xlsx, .csv, .db)"
+                
                 # Leer el archivo según la extensión y cargarlo en un DataFrame 
-                if extension == 'xlsx':
-                    files.read_xlsx(selected_file, dfs)
-                  
-                if extension == 'csv':
-                    files.reald_csv(selected_file, dfs)
-                 
-                if extension == 'db':
-                    files.read_database(selected_file, dfs)
-                    
+                files.read_file(selected_file, dfs, extension)
+                
                 listX = []
                 listY = []
                 lista_columnas = []
@@ -115,8 +111,8 @@ def interface(dfs:dict):
             x = [lista_columnas[key] for key in selected_X]
             y = lista_columnas[selected_Y]
 
-            # Verificar si se seleccionaron variables tanto para X como para Y
-            if x and y:
+            
+            if x and y: # Verificar si se seleccionaron variables tanto para X como para Y
                 # Obtener el DataFrame seleccionado
                 selected_file = values['-Archivo-']
                 df = dfs[selected_file]
@@ -129,14 +125,11 @@ def interface(dfs:dict):
 
                 X = X.fillna(X.mean())
 
-                X_train, X_test, y_train, y_test = train_test_split(X,
-                                                                    Y,
-                                                                    test_size=0.2,
-                                                                    random_state=1234,
-                                                                    shuffle=True)
+                X_train, y_train= train_test_split(X, Y, test_size=0.2, random_state=1234, shuffle=True)
                 X_train = sm.add_constant(X_train)
                 modelo = sm.OLS(endog=y_train, exog=X_train)
                 modelo = modelo.fit()
+
                 # Muestra la gráfica de regresión lineal
                 regression.mostrar_grafica_regresion(modelo, X,Y, window)
                 regression.cosas_regresion(modelo, window)

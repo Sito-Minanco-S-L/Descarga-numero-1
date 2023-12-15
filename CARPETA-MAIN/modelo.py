@@ -20,7 +20,8 @@ class Model():
     def make_model(self):
         x_train, x_test, y_train, y_test = train_test_split(self.x,self.y,test_size=0.2,random_state=1234, shuffle=True)
         x_train = sm.add_constant(x_train)
-        model = sm.OLS(end_og=y_train, execute_og=x_train)
+        #model = sm.OLS(end_og=y_train, ex_og=x_train)
+        model = sm.OLS(endog=y_train, exog=x_train)
         model = model.fit()
         return model
     

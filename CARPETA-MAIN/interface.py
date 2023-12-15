@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
-from modelo import Modelo, cargar_modelo
+from modelo import Model, load_model
 
 
 
@@ -121,11 +121,11 @@ def interface(dfs:dict):
 
                 X = X.fillna(X.mean())
 
-                modelo = Modelo(x,y,X,Y)
+                model = Model(x,y,X,Y)
 
                 # Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.show_regression_graph(model.get_model(), model.get_x_data(),model.get_y_data(), window)
+                regression.regression_elements(model.get_model(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -140,14 +140,14 @@ def interface(dfs:dict):
 
 
         if event == '--FILENAME--':
-            modelo.guardar(values['--FILENAME--'])
+            model.guardar(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
-            modelo = cargar_modelo(selected_model)
-            regression.regression_elements(modelo.get_modelo(), window)
+            model = load_model(selected_model)
+            regression.regression_elements(model.get_model(), window)
             #Muestra la gráfica de regresión lineal
-            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.show_regression_graph(model.get_model(), model.get_x_data(), model.get_y_data(), window)
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

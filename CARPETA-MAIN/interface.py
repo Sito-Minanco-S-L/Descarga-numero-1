@@ -140,7 +140,7 @@ def interface(dfs:dict):
 
 
         if event == '--FILENAME--':
-            model.guardar(values['--FILENAME--'])
+            modelo.save_modelo(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 

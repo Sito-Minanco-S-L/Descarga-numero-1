@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
-from modelo import Modelo
+from modelo import Modelo, cargar_modelo
 
 def interface(dfs:dict):
     """
@@ -35,7 +35,7 @@ def interface(dfs:dict):
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
         sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
-        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=False, file_types='.flp', enable_events=True)
+        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=True, file_types='.flp', enable_events=True)
 
       ]])]
     ]
@@ -121,8 +121,7 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
-                modelo.guardar()
-                print('hola')
+                modelo.guardar('pruebaaa')
                 # Muestra la gráfica de regresión lineal
                 regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
                 regression.cosas_regresion(modelo.get_modelo(), window)
@@ -140,14 +139,15 @@ def interface(dfs:dict):
 
 
         if event == '--FILENAME--':
-            modelo.save(values['--FILENAME--'])
+            modelo.guardar(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
-            modelo = sm.load(selected_model)
-            regression.cosas_regresion(modelo, window)
+
+            modelo = cargar_modelo(selected_model)
+            regression.cosas_regresion(modelo.get_modelo(), window)
             #Muestra la gráfica de regresión lineal
-            regression.mostrar_grafica_regresion(modelo, X, Y, window)
+            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

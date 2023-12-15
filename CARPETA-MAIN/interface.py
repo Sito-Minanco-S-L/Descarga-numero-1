@@ -24,7 +24,8 @@ def interface(dfs:dict):
     [sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])],
     [sg.Frame('',[],key='--TABLA--')],
     [sg.Column([
-        [sg.Image(key='-IMAGE1-', size=(300, 200)), sg.Image(key='-IMAGE2-', size=(300, 200))]
+        [sg.Image(key='-IMAGE2-', size=(300, 200))],
+        [sg.Text('Fórmula del modelo:', key='-COEFICIENTES-')]
     ], justification='center')],
 
     [sg.Frame('',[[
@@ -123,9 +124,21 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
+
+                formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"  # Término de la constante
+
+
+    # Agregar los términos para las variables predictoras
+                for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
+                    formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
+
+    # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
+                window['-COEFICIENTES-'].update(value=formula, font=('Helvetica', 16))
+
+
                 # Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.cosas_regresion(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -145,9 +158,9 @@ def interface(dfs:dict):
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = cargar_modelo(selected_model)
-            regression.regression_elements(modelo.get_modelo(), window)
+            regression.cosas_regresion(modelo.get_modelo(), window)
             #Muestra la gráfica de regresión lineal
-            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

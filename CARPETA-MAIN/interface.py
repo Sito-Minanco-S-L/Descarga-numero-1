@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
+from modelo import Modelo
 
 def interface(dfs:dict):
     """
@@ -43,9 +44,9 @@ def interface(dfs:dict):
     # Crear ventana menu
     window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
 
-
     while True:
         event, values = window.read()
+
         # Salir de la aplicación si se cierra la ventana o se presiona el botón 'Salir'
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
@@ -118,14 +119,13 @@ def interface(dfs:dict):
 
                 X = X.fillna(X.mean())
 
-                X_train, y_train= train_test_split(X, Y, test_size=0.2, random_state=1234, shuffle=True)
-                X_train = sm.add_constant(X_train)
-                modelo = sm.OLS(endog=y_train, exog=X_train)
-                modelo = modelo.fit()
+                modelo = Modelo(x,y,X,Y)
 
+                modelo.guardar()
+                print('hola')
                 # Muestra la gráfica de regresión lineal
-                regression.mostrar_grafica_regresion(modelo, X,Y, window)
-                regression.cosas_regresion(modelo, window)
+                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.cosas_regresion(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -136,6 +136,7 @@ def interface(dfs:dict):
             window['Cargar Modelo'].update(visible=True)
             
             window['Salir'].update(visible=True)
+
 
 
         if event == '--FILENAME--':
@@ -150,3 +151,5 @@ def interface(dfs:dict):
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()
+
+

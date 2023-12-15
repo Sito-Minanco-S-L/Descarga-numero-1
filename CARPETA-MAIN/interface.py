@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
-from modelo import Modelo, cargar_modelo
+from modelo import Modelo
 
 def interface(dfs:dict):
     """
@@ -12,14 +12,14 @@ def interface(dfs:dict):
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
     """
-    col1 = sg.Column([[sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])]],pad=(0,0))
+    column_1 = sg.Column([[sg.Frame(' X ', [[sg.Column([],key='--COLUMN_X--')]])]],pad=(0,0))
 
-    col2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])]],pad=(0,0))
+    column_2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])]],pad=(0,0))
 
     layout = [
     [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV y Excel y Base de Datos", "*.csv;*.xlsx;*.db"),))],
-    [sg.Frame(' X ', [[sg.Column([],key='--COLX--')]])],
-    [sg.Frame(' Y ', [[sg.Column([],key='--COLY--')]])],
+    [sg.Frame(' X ', [[sg.Column([],key='--COLUMN_X--')]])],
+    [sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])],
     [sg.Frame('',[],key='--TABLA--')],
     [sg.Column([
         [sg.Image(key='-IMAGE1-', size=(300, 200)), sg.Image(key='-IMAGE2-', size=(300, 200))]
@@ -35,7 +35,7 @@ def interface(dfs:dict):
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
         sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
-        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=True, file_types='.flp', enable_events=True)
+        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=False, file_types='.flp', enable_events=True)
 
       ]])]
     ]
@@ -63,18 +63,18 @@ def interface(dfs:dict):
                 # Leer el archivo según la extensión y cargarlo en un DataFrame 
                 files.read_file(selected_file, dfs, extension)
                 
-                listX = []
-                listY = []
-                lista_columnas = []
+                list_X = []
+                list_Y = []
+                list_columns = []
 
                 for i in dfs[selected_file].keys():                    
-                    listX.append(sg.Checkbox(str(i)))
-                    listY.append(sg.Radio(str(i), group_id='--VAR_Y--'))
-                    lista_columnas.append(i)
+                    list_X.append(sg.Checkbox(str(i)))
+                    list_Y.append(sg.Radio(str(i), group_id='--VARIABLE_Y--'))
+                    list_columns.append(i)
 
 
-                window.extend_layout(window['--COLX--'], [listX])
-                window.extend_layout(window['--COLY--'], [listY])
+                window.extend_layout(window['--COLUMN_X--'], [list_X])
+                window.extend_layout(window['--COLUMN_Y--'], [list_Y])
 
                 table_data = dfs[selected_file].to_numpy().tolist()
                 table_headings = dfs[selected_file].columns.tolist()
@@ -102,8 +102,8 @@ def interface(dfs:dict):
             selected_X = [key for key, value in values.items() if value is True and key != '--VAR Y--']
             selected_Y = selected_X[-1] - len(dfs[selected_file].columns)
             selected_X = selected_X[:-1]
-            x = [lista_columnas[key] for key in selected_X]
-            y = lista_columnas[selected_Y]
+            x = [list_columns[key] for key in selected_X]
+            y = list_columns[selected_Y]
 
             
             if x and y: # Verificar si se seleccionaron variables tanto para X como para Y
@@ -121,10 +121,11 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
-                modelo.guardar('pruebaaa')
+                modelo.guardar()
+                print('hola')
                 # Muestra la gráfica de regresión lineal
-                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.cosas_regresion(modelo.get_modelo(), window)
+                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -139,17 +140,17 @@ def interface(dfs:dict):
 
 
         if event == '--FILENAME--':
-            modelo.guardar(values['--FILENAME--'])
+            modelo.save(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
-
-            modelo = cargar_modelo(selected_model)
-            regression.cosas_regresion(modelo.get_modelo(), window)
+            modelo = sm.load(selected_model)
+            regression.regression_elements(modelo, window)
             #Muestra la gráfica de regresión lineal
-            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.show_regression_graph(modelo, X, Y, window)
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()
+
 
 

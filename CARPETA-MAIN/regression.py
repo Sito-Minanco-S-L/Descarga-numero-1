@@ -6,61 +6,61 @@ from PIL import Image, ImageDraw, ImageFont
 
 def convert_text_to_image(text):
     # Configuración de la imagen
-    img = Image.new('RGB', (800, 600), color=(255, 255, 255))
-    d = ImageDraw.Draw(img)
+    image = Image.new('RGB', (800, 600), color=(255, 255, 255))
+    draw = ImageDraw.Draw(image)
     font_size = 18
     font = ImageFont.load_default()
 
     # Agregar el texto al lienzo de la imagen
-    d.text((10, 10), text, fill=(0, 0, 0), font=font)
+    draw.text((10, 10), text, fill=(0, 0, 0), font=font)
 
     # Guardar la imagen temporalmente
-    img_path = 'summary_image.png'
-    img.save(img_path)
-    return img_path
+    image_path = 'summary_image.png'
+    image.save(image_path)
+    return image_path
 
 
 
-def interpretar_r_cuadrado(r_cuadrado):
+def interpret_r_squared(r_squared):
     """
     Interpreta el valor de R-cuadrado y devuelve el color y la interpretación correspondientes.
 
     Parameters:
-    - r_cuadrado (float): Valor de R-cuadrado.
+    - r_squared (float): Valor de R-cuadrado.
 
     Returns:
     - Tuple: (str) Color para visualización, (str) Interpretación del R-cuadrado.
     """
-    if 0.8 <= r_cuadrado <= 1:
+    if 0.8 <= r_squared <= 1:
         color = 'green'
-        interpretacion = 'Ajuste óptimo, el modelo explica a la perfección la relación de las variables'
-    elif 0.6 <= r_cuadrado < 0.8:
+        interpretation = 'Ajuste óptimo, el model explica a la perfección la relación de las variables'
+    elif 0.6 <= r_squared < 0.8:
         color = 'yellow'
-        interpretacion = 'Buen Ajuste'
-    elif 0.4 <= r_cuadrado < 0.6:
+        interpretation = 'Buen Ajuste'
+    elif 0.4 <= r_squared < 0.6:
         color = 'yellow'
-        interpretacion = 'Ajuste Aceptable'
-    elif 0.2 <= r_cuadrado < 0.4:
+        interpretation = 'Ajuste Aceptable'
+    elif 0.2 <= r_squared < 0.4:
         color = 'red'
-        interpretacion = 'Ajuste Débil'
+        interpretation = 'Ajuste Débil'
     else:
         color = 'red'
-        interpretacion = 'Ajuste Pésimo, el modelo no es explicativo'
+        interpretation = 'Ajuste Pésimo, el model no es explicativo'
 
-    return color, interpretacion
+    return color, interpretation
 
 
-def mostrar_grafica_regresion(modelo, X, y, window):
+def show_regression_graph(model, X, y, window):
     """
     Muestra la gráfica de la regresión lineal.
 
     Parameters:
-    - modelo: Modelo de regresión lineal ajustado.
+    - model: Modelo de regresión lineal ajustado.
     - X: Variables predictoras.
     - y: Variable a predecir.
     - window: Ventana de la interfaz gráfica donde se mostrará la gráfica.
 
-    La función utiliza el modelo de regresión para predecir los valores y_pred. Si hay más de una variable predictora,
+    La función utiliza el modelo de regresión para predecir los valores y_prediction. Si hay más de una variable predictora,
     muestra una gráfica de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
     muestra la gráfica de dispersión junto con la regresión lineal.
 
@@ -69,69 +69,69 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     """
     # Predice los valores
     X_with_const = sm.add_constant(X)
-    y_pred = modelo.predict(X_with_const)
+    y_prediction = model.predict(X_with_const)
 
     # Crear la figura para la gráfica
-    fig, ax = plt.subplots()
+    figure, ax = plt.subplots()
     
     # Verifica si hay más de una variable predictora
     if X.shape[1] > 1:
         # Si hay más de una variable predictora, no se puede graficar en 2D,
         # así que muestra solo la predicción vs. observado
-        ax.scatter(y, y_pred, label='Observado vs. Predicho')
+        ax.scatter(y, y_prediction, label='Observado vs. Predicho')
         ax.set_xlabel('Observado')
         ax.set_ylabel('Predicho')
     else:
         # Si solo hay una variable predictora, muestra la gráfica de dispersión,
         # y la regresión lineal
         ax.scatter(X.iloc[:, 0], y, label='Datos')
-        ax.plot(X.iloc[:, 0], y_pred, color='red', label='Regresión Lineal')
+        ax.plot(X.iloc[:, 0], y_prediction, color='red', label='Regresión Lineal')
         ax.set_xlabel('Variable Predictora')
         ax.set_ylabel('Variable a Predecir')
 
     ax.legend()
 
     # Ajustar el tamaño de la figura
-    fig.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
+    figure.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
 
     # Guardar la gráfica en un archivo temporal
-    temp_plot = 'temp_plot.png'
-    plt.savefig(temp_plot)
+    temporary_plot = 'temporary_plot.png'
+    plt.savefig(temporary_plot)
     plt.close()
 
     # Mostrar la gráfica en la interfaz
-    with open(temp_plot, "rb") as file:
-        img_bytes = file.read()
+    with open(temporary_plot, "rb") as file:
+        image_bytes = file.read()
     
     # Actualizar el elemento de imagen en la ventana con los nuevos bytes de la imagen
-    window['-IMAGE2-'].update(data=img_bytes)
+    window['-IMAGE2-'].update(data=image_bytes)
 
 
 ## ESTA FUNCION FIXENA COPIANDO UN CACHO DO CODIGO DE NATHAN
 ## ALCULA COUSAS E MOSTRA COUSAS POR PANTALLA UNHA VEZ ESTA FEITO 
-## O MODELO, FACIAME FALTA PA CANDO SE CARGASE O MODELO, ENTONCES CONVERTINO NUNHA FUNCION
-def cosas_regresion(modelo, window):
-    r_squared = modelo.rsquared
-    color, interpretacion = interpretar_r_cuadrado(r_squared)
+## O modelo, FACIAME FALTA PA CANDO SE CARGASE O modelo, ENTONCES CONVERTINO NUNHA FUNCION
+def regression_elements(model, window):
+    r_squared = model.rsquared
+    color, interpretation = interpret_r_squared(r_squared)
 
-    resultados = modelo.summary()
-    resultados_str = str(resultados)
-    #window['-OUTPUT-'].update(value=resultados_str)
-    img_path = convert_text_to_image(resultados_str)
-    img = Image.open(img_path)
-    img = img.resize((700, 400))  # Ajusta el tamaño de la imagen
-    img.save(img_path)
+    results = model.summary()
+    results_str = str(results)
+    #window['-OUTPUT-'].update(value=results_str)
+    image_path = convert_text_to_image(results_str)
+    image = Image.open(image_path)
+    image = image.resize((700, 400))  # Ajusta el tamaño de la imagen
+    image.save(image_path)
 
     # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada
-    window['-IMAGE1-'].update(filename=img_path)
+    window['-IMAGE1-'].update(filename=image_path)
     
-    layout_resultados = [
+    layout_results = [
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
-        [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
+        [sg.Text(f'Interpretación: {interpretation}', font=('Helvetica', 12))]
     ]
-    window_resultados = sg.Window('Resultados del Modelo', layout_resultados)
-    event, values = window_resultados.read()
-    window_resultados.close()
+    window_results = sg.Window('Resultados del modelo', layout_results)
+    event, values = window_results.read()
+    window_results.close()
 
 
 

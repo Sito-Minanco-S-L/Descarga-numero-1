@@ -46,3 +46,54 @@ def read_file(selected_file, dfs:dict, extension):
         dfs[selected_file] = df_numeric
         conexion.close()
         print(sg.popup_auto_close('¡Archivo cargado con éxito!'))
+
+
+
+
+'''
+Patrones de Diseño----->
+
+class FileReaderFactory:
+    @staticmethod
+    def create_file_reader(extension):
+        if extension == 'xlsx':
+            return ExcelFileReader()
+        elif extension == 'csv':
+            return CsvFileReader()
+        elif extension == 'db':
+            return DbFileReader()
+        else:
+            raise ValueError(f'Unsupported file extension: {extension}')
+
+class ExcelFileReader:
+    def read_file(self, selected_file, dfs):
+        df = pd.read_excel(selected_file)
+        df_numeric = df.select_dtypes(include=[np.number])
+        dfs[selected_file] = df_numeric
+        print(sg.popup_auto_close('¡Archivo de Excel cargado con éxito!'))
+
+class CsvFileReader:
+    def read_file(self, selected_file, dfs):
+        df = pd.read_csv(selected_file)
+        df_numeric = df.select_dtypes(include=[np.number])
+        dfs[selected_file] = df_numeric
+        print(sg.popup_auto_close('¡Archivo CSV cargado con éxito!'))
+
+class DbFileReader:
+    def read_file(self, selected_file, dfs):
+        conexion = sqlite3.connect('housing.db')
+        cursor = conexion.cursor()
+        consulta_sql = 'SELECT * FROM california_housing_dataset'
+        cursor.execute(consulta_sql)
+        resultados = cursor.fetchall()
+        nombres_columnas = [descripcion[0] for descripcion in cursor.description]
+        df = pd.DataFrame(resultados, columns=nombres_columnas)
+        df_numeric = df.select_dtypes(include=[np.number])
+        dfs[selected_file] = df_numeric
+        conexion.close()
+        print(sg.popup_auto_close('¡Archivo de Base de Datos cargado con éxito!'))
+
+def read_file(selected_file, dfs, extension):
+    file_reader = FileReaderFactory.create_file_reader(extension)
+    file_reader.read_file(selected_file, dfs)
+    '''

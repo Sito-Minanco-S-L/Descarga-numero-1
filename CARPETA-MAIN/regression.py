@@ -9,7 +9,7 @@ def convert_text_to_image(text):
     img = Image.new('RGB', (800, 600), color=(255, 255, 255))
     d = ImageDraw.Draw(img)
     font_size = 18
-    font = ImageFont.truetype("arial.ttf", font_size)
+    font = ImageFont.load_default()
 
     # Agregar el texto al lienzo de la imagen
     d.text((10, 10), text, fill=(0, 0, 0), font=font)

@@ -5,6 +5,8 @@ import regression
 import files
 from modelo import Modelo, cargar_modelo
 
+
+
 def interface(dfs:dict):
     """
     Interfaz principal que permite cargar archivos, realizar regresiones lineales y gestionar modelos.
@@ -152,10 +154,10 @@ def interface(dfs:dict):
 
 
 
-'''
+
 Patrones de Diseño--->
 Template Method
-
+'''
 class InterfaceTemplate:
     def __init__(self, dfs):
         self.dfs = dfs

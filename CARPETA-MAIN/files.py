@@ -3,6 +3,10 @@ import numpy as np
 import sqlite3
 import PySimpleGUI as sg
 
+
+
+
+'''
 def file_extension(file):
     """
     Obtiene la extensión de un archivo a partir de su nombre.
@@ -51,7 +55,22 @@ def read_file(selected_file, dfs:dict, extension):
 
 
 '''
-Patrones de Diseño----->
+#Patron de diseño------>Factor method
+
+def file_extension(file):
+    """
+    Obtiene la extensión de un archivo a partir de su nombre.
+
+    Parameters:
+    - file (str): Nombre del archivo.
+
+    Returns:
+    - str: Extensión del archivo.
+    """
+    # Divide el nombre del archivo y retorna la última parte como extensión
+    L = file.split('.')
+    return L[-1]
+
 
 class FileReaderFactory:
     @staticmethod
@@ -96,4 +115,3 @@ class DbFileReader:
 def read_file(selected_file, dfs, extension):
     file_reader = FileReaderFactory.create_file_reader(extension)
     file_reader.read_file(selected_file, dfs)
-    '''

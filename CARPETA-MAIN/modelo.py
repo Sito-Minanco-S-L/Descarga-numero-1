@@ -2,6 +2,13 @@ from sklearn.model_selection import train_test_split
 import statsmodels.api as sm
 import pickle
 
+
+def cargar_modelo(pickle_file_name):
+    with open(pickle_file_name, "rb") as f:
+        modelo = pickle.load(f)
+    return modelo
+
+
 class Modelo():
     def __init__(self, x_name, y_name,x ,y) -> None:
         self.x_name = x_name
@@ -31,4 +38,5 @@ class Modelo():
     
     def guardar(self):
         with open('Modelo.pickle', 'wb') as f:
-            pickle.dump(self.modelo, f)
+            pickle.dump(self, f)
+

@@ -153,11 +153,11 @@ def interface(dfs:dict):
     window.close()
 
 
-
+'''
 
 Patrones de Diseño--->
 Template Method
-'''
+
 class InterfaceTemplate:
     def __init__(self, dfs):
         self.dfs = dfs

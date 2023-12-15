@@ -156,7 +156,6 @@ def interface(dfs:dict):
 Patrones de Diseño--->
 Template Method
 
-
 class InterfaceTemplate:
     def __init__(self, dfs):
         self.dfs = dfs

@@ -35,7 +35,7 @@ def interface(dfs:dict):
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
         sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
-        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=True, file_types='.pickle', enable_events=True)
+        sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=True, enable_events=True)
 
       ]])]
     ]

@@ -36,11 +36,11 @@ def read_file(selected_file, dfs:dict, extension):
     if extension == 'db': #para leer archivos .db
         conexion = sqlite3.connect('housing.db')
         cursor = conexion.cursor()
-        consulta_sql = 'SELECT * FROM california_housing_dataset'
-        cursor.execute(consulta_sql)
-        resultados = cursor.fetchall()
+        search_sql = 'SELECT * FROM california_housing_dataset'
+        cursor.execute(search_sql)
+        results = cursor.fetchall()
         nombres_columnas = [descripcion[0] for descripcion in cursor.description]
-        df = pd.DataFrame(resultados, columns=nombres_columnas)
+        df = pd.DataFrame(results, columns=nombres_columnas)
                         
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
@@ -83,11 +83,11 @@ class DbFileReader:
     def read_file(self, selected_file, dfs):
         conexion = sqlite3.connect('housing.db')
         cursor = conexion.cursor()
-        consulta_sql = 'SELECT * FROM california_housing_dataset'
-        cursor.execute(consulta_sql)
-        resultados = cursor.fetchall()
+        search_sql = 'SELECT * FROM california_housing_dataset'
+        cursor.execute(search_sql)
+        results = cursor.fetchall()
         nombres_columnas = [descripcion[0] for descripcion in cursor.description]
-        df = pd.DataFrame(resultados, columns=nombres_columnas)
+        df = pd.DataFrame(results, columns=nombres_columnas)
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
         conexion.close()

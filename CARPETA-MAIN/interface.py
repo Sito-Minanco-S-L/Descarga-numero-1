@@ -109,14 +109,12 @@ def interface(dfs:dict):
             x = [list_columns[key] for key in selected_X]
             y = list_columns[selected_Y]
 
-            
             if x and y: # Verificar si se seleccionaron variables tanto para X como para Y
                 # Obtener el DataFrame seleccionado
                 selected_file = values['-Archivo-']
                 df = dfs[selected_file]
 
                 # Verificar si las claves seleccionadas existen como columnas en el DataFrame
-
                 # Separar claramente las variables de X e Y
                 X = df[x]
                 Y = df[y]
@@ -138,8 +136,8 @@ def interface(dfs:dict):
 
 
                 # Muestra la gráfica de regresión lineal
-                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.cosas_regresion(modelo.get_modelo(), window)
+                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -159,9 +157,9 @@ def interface(dfs:dict):
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = cargar_modelo(selected_model)
-            regression.cosas_regresion(modelo.get_modelo(), window)
+            regression.regression_elements(modelo.get_modelo(), window)
             #Muestra la gráfica de regresión lineal
-            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

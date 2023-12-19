@@ -57,12 +57,12 @@ def interpret_r_squared(r_squared):
     return color, interpretation
 
 
-def show_regression_graph(modelo, X, y, window):
+def show_regression_graph(model, X, y, window):
     """
     Muestra la gráfica de la regresión lineal.
 
     Parameters:
-    - modelo: Modelo de regresión lineal ajustado.
+    - model: Modelo de regresión lineal ajustado.
     - X: Variables predictoras.
     - y: Variable a predecir.
     - window: Ventana de la interfaz gráfica donde se mostrará la gráfica.
@@ -76,7 +76,7 @@ def show_regression_graph(modelo, X, y, window):
     """
     # Predice los valores
     X_with_const = sm.add_constant(X)
-    y_predict = modelo.predict(X_with_const)
+    y_predict = model.predict(X_with_const)
     # Crear la figura para la gráfica
     figure, ax = plt.subplots()
     # Verifica si hay más de una variable predictora
@@ -109,12 +109,12 @@ def show_regression_graph(modelo, X, y, window):
     window['-IMAGE2-'].update(data=image_bytes)
 
 
-def regression_elements(modelo, window):
+def regression_elements(model, window):
     """
     Muestra los resultados del modelo de regresión en una ventana.
 
     Parameters:
-    - modelo: Modelo de regresión lineal ajustado.
+    - model: Modelo de regresión lineal ajustado.
     - window: Ventana de la interfaz gráfica donde se mostrarán los resultados.
 
     La función interpreta el R-cuadrado, muestra un resumen del modelo en una imagen y
@@ -123,10 +123,10 @@ def regression_elements(modelo, window):
     Returns:
     - None
     """
-    r_squared = modelo.rsquared
+    r_squared = model.rsquared
     color, interpretation = interpret_r_squared(r_squared)
 
-    results = modelo.summary()
+    results = model.summary()
     results_str = str(results)
     
     image_path = convert_text_to_image(results_str)
@@ -138,6 +138,6 @@ def regression_elements(modelo, window):
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
         [sg.Text(f'Interpretación: {interpretation}', font=('Helvetica', 12))]
     ]
-    window_results = sg.Window('results del Modelo', layout_results)
+    window_results = sg.Window('Resultados del Modelo', layout_results)
     event, values = window_results.read()
     window_results.close()

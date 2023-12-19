@@ -5,15 +5,22 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def convert_text_to_image(text):
+    """
+    Convierte un texto en una imagen y la guarda temporalmente.
+
+    Parameters:
+    - text (str): Texto a convertir en imagen.
+
+    Returns:
+    - str: Ruta del archivo de imagen temporal.
+    """
     # Configuración de la imagen
     image = Image.new('RGB', (800, 600), color=(255, 255, 255))
     draw = ImageDraw.Draw(image)
     font_size = 18
     font = ImageFont.load_default()
-
     # Agregar el texto al lienzo de la imagen
     draw.text((10, 10), text, fill=(0, 0, 0), font=font)
-
     # Guardar la imagen temporalmente
     image_path = 'summary_image.png'
     image.save(image_path)
@@ -21,7 +28,7 @@ def convert_text_to_image(text):
 
 
 
-def interpretar_r_cuadrado(r_squared):
+def interpret_r_squared(r_squared):
     """
     Interpreta el valor de R-cuadrado y devuelve el color y la interpretación correspondientes.
 
@@ -50,7 +57,7 @@ def interpretar_r_cuadrado(r_squared):
     return color, interpretation
 
 
-def mostrar_grafica_regresion(modelo, X, y, window):
+def show_regression_graph(modelo, X, y, window):
     """
     Muestra la gráfica de la regresión lineal.
 
@@ -60,7 +67,7 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     - y: Variable a predecir.
     - window: Ventana de la interfaz gráfica donde se mostrará la gráfica.
 
-    La función utiliza el modelo de regresión para predecir los valores y_pred. Si hay más de una variable predictora,
+    La función utiliza el modelo de regresión para predecir los valores y_predict. Si hay más de una variable predictora,
     muestra una gráfica de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
     muestra la gráfica de dispersión junto con la regresión lineal.
 
@@ -69,69 +76,68 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     """
     # Predice los valores
     X_with_const = sm.add_constant(X)
-    y_pred = modelo.predict(X_with_const)
-
+    y_predict = modelo.predict(X_with_const)
     # Crear la figura para la gráfica
-    fig, ax = plt.subplots()
-    
+    figure, ax = plt.subplots()
     # Verifica si hay más de una variable predictora
     if X.shape[1] > 1:
         # Si hay más de una variable predictora, no se puede graficar en 2D,
         # así que muestra solo la predicción vs. observado
-        ax.scatter(y, y_pred, label=f'{y.name} vs. Predicción')
+        ax.scatter(y, y_predict, label=f'{y.name} vs. Predicción')
         ax.set_xlabel(y.name)
         ax.set_ylabel('Predicción')
     else:
         # Si solo hay una variable predictora, muestra la gráfica de dispersión,
         # y la regresión lineal
         ax.scatter(X.iloc[:, 0], y, label=f'{X.columns[0]} vs. {y.name}')
-        ax.plot(X.iloc[:, 0], y_pred, color='red', label='Regresión Lineal')
+        ax.plot(X.iloc[:, 0], y_predict, color='red', label='Regresión Lineal')
         ax.set_xlabel(X.columns[0])
         ax.set_ylabel(y.name)
 
     ax.legend()
 
     # Ajustar el tamaño de la figura
-    fig.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
-
+    figure.set_size_inches(6, 4)  # Ajusta el tamaño de la figura
     # Guardar la gráfica en un archivo temporal
-    temp_plot = 'temp_plot.png'
-    plt.savefig(temp_plot)
+    temporary_plot = 'temporary_plot.png'
+    plt.savefig(temporary_plot)
     plt.close()
-
     # Mostrar la gráfica en la interfaz
-    with open(temp_plot, "rb") as file:
-        img_bytes = file.read()
-    
+    with open(temporary_plot, "rb") as file:
+        image_bytes = file.read()
     # Actualizar el elemento de imagen en la ventana con los nuevos bytes de la imagen
-    window['-IMAGE2-'].update(data=img_bytes)
+    window['-IMAGE2-'].update(data=image_bytes)
 
 
-def cosas_regresion(modelo, window):
+def regression_elements(modelo, window):
+    """
+    Muestra los resultados del modelo de regresión en una ventana.
+
+    Parameters:
+    - modelo: Modelo de regresión lineal ajustado.
+    - window: Ventana de la interfaz gráfica donde se mostrarán los resultados.
+
+    La función interpreta el R-cuadrado, muestra un resumen del modelo en una imagen y
+    muestra una ventana adicional con el R-cuadrado y su interpretación.
+
+    Returns:
+    - None
+    """
     r_squared = modelo.rsquared
-    color, interpretacion = interpretar_r_cuadrado(r_squared)
+    color, interpretation = interpret_r_squared(r_squared)
 
-    resultados = modelo.summary()
-    resultados_str = str(resultados)
-    #window['-OUTPUT-'].update(value=resultados_str)
-    img_path = convert_text_to_image(resultados_str)
-    img = Image.open(img_path)
-    img = img.resize((700, 400))  # Ajusta el tamaño de la imagen
-    img.save(img_path)
-
-    # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada
+    results = modelo.summary()
+    results_str = str(results)
     
-    layout_resultados = [
+    image_path = convert_text_to_image(results_str)
+    image = Image.open(image_path)
+    image = image.resize((700, 400))  # Ajusta el tamaño de la imagen
+    image.save(image_path)
+    # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada
+    layout_results = [
         [sg.Text(f'R-cuadrado: {r_squared:.4f}', font=('Helvetica', 12), text_color=color)],
-        [sg.Text(f'Interpretación: {interpretacion}', font=('Helvetica', 12))]
+        [sg.Text(f'Interpretación: {interpretation}', font=('Helvetica', 12))]
     ]
-    window_resultados = sg.Window('Resultados del Modelo', layout_resultados)
-    event, values = window_resultados.read()
-    window_resultados.close()
-
-
-
-
-
-if __name__ == '__main__':
-    pass
+    window_results = sg.Window('results del Modelo', layout_results)
+    event, values = window_results.read()
+    window_results.close()

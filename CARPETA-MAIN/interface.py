@@ -96,6 +96,7 @@ def interface(dfs:dict):
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
 
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 

@@ -16,8 +16,6 @@ class Modelo():
         self.x = x
         self.y = y
         self.modelo = self.make_modelo()
-        self.coeficientes = self.modelo.params
-        self.columnas = self.x.columns.tolist()
 
     def make_modelo(self):
         x_train, x_test, y_train, y_test = train_test_split(self.x,self.y,test_size=0.2,random_state=1234, shuffle=True)
@@ -47,7 +45,14 @@ class Modelo():
 
 
     def get_coeficientes(self):
-        return self.coeficientes
+        print(self.modelo.params)
+        return self.modelo.params
 
     def nombres_columnas(self):
-        return self.columnas
+        return self.x.columns.tolist()
+    
+
+def realizar_predicción(modelo, x):
+    resultado = ((modelo.get_coeficientes()[1]) * int(x)) + modelo.get_coeficientes()[0]
+    return resultado
+    

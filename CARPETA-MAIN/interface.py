@@ -3,7 +3,8 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
-from modelo import Modelo, cargar_modelo
+from modelo import Modelo, cargar_modelo, realizar_predicción
+from regression import *
 
 
 
@@ -25,8 +26,12 @@ def interface(dfs:dict):
     [sg.Frame('',[],key='--TABLA--')],
     [sg.Column([
         [sg.Image(key='-IMAGE2-', size=(300, 200))],
-        [sg.Text('Fórmula del modelo:', key='-COEFICIENTES-')]
+        [sg.Text('Fórmula del modelo:', key='-COEFICIENTES-', visible=False)],
+        [sg.Text('', size=(30, 1), key='-R_SQUARED-', font=('Helvetica', 12))],
+        [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))],
     ], justification='center')],
+
+    [sg.Frame('',[],key='--PRUEBA--',element_justification='centre',title_location='n', font='verdana')],
 
     [sg.Frame('',[[
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
@@ -34,19 +39,20 @@ def interface(dfs:dict):
         sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='1'),
         sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='2'),
         sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='3'),
-        sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='4'),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='4'),
+        sg.Button('Realizar Predicción', size=(20, 2), button_color=('white', 'grey'), visible=True,enable_events=True),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
         sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
         sg.FileBrowse('Cargar Modelo', size=(20,2), button_color=('black', 'orange'), visible=True, enable_events=True)
 
-      ]])]
+      ]])],
+
     ]
 
 
     # Crear ventana menu
     window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
-
     while True:
         event, values = window.read()
 
@@ -96,7 +102,6 @@ def interface(dfs:dict):
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
 
-
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -109,12 +114,14 @@ def interface(dfs:dict):
             x = [list_columns[key] for key in selected_X]
             y = list_columns[selected_Y]
 
+            
             if x and y: # Verificar si se seleccionaron variables tanto para X como para Y
                 # Obtener el DataFrame seleccionado
                 selected_file = values['-Archivo-']
                 df = dfs[selected_file]
 
                 # Verificar si las claves seleccionadas existen como columnas en el DataFrame
+
                 # Separar claramente las variables de X e Y
                 X = df[x]
                 Y = df[y]
@@ -123,21 +130,41 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
+                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+        
+        # Calcula el R^2, su interpretación y los coeficientes del modelo
+                # Calcula el R^2 y su interpretació
 
-                formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"  # Término de la constante
+                # Construir el texto con el R^2
+                # Calcula el R^2 y su interpretación
+                r_squared = modelo.get_modelo().rsquared
+                color, interpretacion = interpretar_r_cuadrado(r_squared)
+
+                # Actualizar el elemento de texto en la interfaz con los detalles del modelo
+                window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
+                window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretacion}')
+
+
+
+                regression.cosas_regresion(modelo.get_modelo(), window)
+
+
+                formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"
 
 
     # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
                     formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
 
+
     # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
-                window['-COEFICIENTES-'].update(value=formula, font=('Helvetica', 16))
+                window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
+
 
 
                 # Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.cosas_regresion(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -157,9 +184,38 @@ def interface(dfs:dict):
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = cargar_modelo(selected_model)
-            regression.regression_elements(modelo.get_modelo(), window)
+            regression.cosas_regresion(modelo.get_modelo(), window)
             #Muestra la gráfica de regresión lineal
-            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            r_squared = modelo.get_modelo().rsquared
+            color, interpretacion = interpretar_r_cuadrado(r_squared)
+
+    # Construir la fórmula del modelo
+            formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"  # Término de la constante
+
+    # Agregar los términos para las variables predictoras
+            for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
+                formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
+
+    # Actualizar los elementos de texto en la interfaz con los detalles del modelo
+            window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
+            window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretacion}')
+            window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
+
+
+        if event == 'Realizar Predicción':
+            text_cut = 2
+            window.extend_layout(window['--PRUEBA--'], [[sg.Text(modelo.nombres_columnas()[0].upper(), font='verdana')],[sg.Input('',size=(15,40), key='-valores-pred-')], [sg.Button('Submit')]])
+            window['--PRUEBA--'].update('PREDICCION A PARTIR DEL MODELO')
+            event, values = window.read()
+            
+            if event == 'Submit':
+                resultado = realizar_predicción(modelo,values['-valores-pred-'])
+                texto = 'Resultado --> {:4f}'.format(resultado)
+                window.extend_layout(window['--PRUEBA--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
+
+
+
 
 # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

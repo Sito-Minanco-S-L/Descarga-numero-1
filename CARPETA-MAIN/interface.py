@@ -53,7 +53,6 @@ def interface(dfs:dict):
 
     # Crear ventana menu
     window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
-    modelo = cargar_modelo('2variables.pickle')
     while True:
         event, values = window.read()
 
@@ -208,7 +207,7 @@ def interface(dfs:dict):
             layout = []
             for i in range(len(modelo.nombres_columnas())):
                 layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.nombres_columnas()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
-            layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(5.5,1.75))]]))
+            layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout])
         if event == 'Submit':
             valores_x = []

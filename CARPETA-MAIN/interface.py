@@ -31,7 +31,7 @@ def interface(dfs:dict):
         [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))],
     ], justification='center')],
 
-    [sg.Frame('',[],key='--PRUEBA--',element_justification='centre',title_location='n', font='verdana')],
+    [sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')],
 
     [sg.Frame('',[[
         sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
@@ -53,6 +53,7 @@ def interface(dfs:dict):
 
     # Crear ventana menu
     window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
+    modelo = cargar_modelo('2variables.pickle')
     while True:
         event, values = window.read()
 
@@ -148,7 +149,6 @@ def interface(dfs:dict):
 
                 regression.cosas_regresion(modelo.get_modelo(), window)
 
-
                 formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"
 
 
@@ -204,15 +204,19 @@ def interface(dfs:dict):
 
 
         if event == 'Realizar Predicción':
-            text_cut = 2
-            window.extend_layout(window['--PRUEBA--'], [[sg.Text(modelo.nombres_columnas()[0].upper(), font='verdana')],[sg.Input('',size=(15,40), key='-valores-pred-')], [sg.Button('Submit')]])
-            window['--PRUEBA--'].update('PREDICCION A PARTIR DEL MODELO')
-            event, values = window.read()
-            
-            if event == 'Submit':
-                resultado = realizar_predicción(modelo,values['-valores-pred-'])
-                texto = 'Resultado --> {:4f}'.format(resultado)
-                window.extend_layout(window['--PRUEBA--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
+            window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
+            layout = []
+            for i in range(len(modelo.nombres_columnas())):
+                layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.nombres_columnas()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
+            layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(5.5,1.75))]]))
+            window.extend_layout(window['--VARIABLES-PRED--'], [layout])
+        if event == 'Submit':
+            valores_x = []
+            for i in range(len(modelo.nombres_columnas())):
+                valores_x.append(values['-valores-pred-'+str(i)])
+            resultado = realizar_predicción(modelo,valores_x)
+            texto = 'Resultado --> {:4f}'.format(resultado)
+            window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
 
 
 

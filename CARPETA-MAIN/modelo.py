@@ -52,7 +52,9 @@ class Modelo():
         return self.x.columns.tolist()
     
 
-def realizar_predicción(modelo, x):
-    resultado = ((modelo.get_coeficientes()[1]) * int(x)) + modelo.get_coeficientes()[0]
+def realizar_predicción(modelo, x:list):
+    resultado = modelo.get_coeficientes()[0]
+    for i in range(len(x)):
+        resultado += ((modelo.get_coeficientes()[i+1]) * int(x[i]))
     return resultado
     

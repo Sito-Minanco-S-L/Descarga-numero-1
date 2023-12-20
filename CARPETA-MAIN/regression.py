@@ -61,7 +61,7 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     - window: Ventana de la interfaz gráfica donde se mostrará la gráfica.
 
     La función utiliza el modelo de regresión para predecir los valores y_pred. Si hay más de una variable predictora,
-    muestra una gráfica de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
+    muestra una gráfica 3D de dispersión entre los valores observados y predichos. Si solo hay una variable predictora,
     muestra la gráfica de dispersión junto con la regresión lineal.
 
     Returns:
@@ -72,15 +72,16 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     y_pred = modelo.predict(X_with_const)
 
     # Crear la figura para la gráfica
-    fig, ax = plt.subplots()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
     
     # Verifica si hay más de una variable predictora
     if X.shape[1] > 1:
-        # Si hay más de una variable predictora, no se puede graficar en 2D,
-        # así que muestra solo la predicción vs. observado
-        ax.scatter(y, y_pred, label=f'{y.name} vs. Predicción')
-        ax.set_xlabel(y.name)
-        ax.set_ylabel('Predicción')
+        # Si hay más de una variable predictora, muestra la gráfica 3D de dispersión
+        ax.scatter(X.iloc[:, 0], X.iloc[:, 1], y, label=f'Observado vs. Predicción')
+        ax.set_xlabel(X.columns[0])
+        ax.set_ylabel(X.columns[1])
+        ax.set_zlabel(y.name)
     else:
         # Si solo hay una variable predictora, muestra la gráfica de dispersión,
         # y la regresión lineal
@@ -105,6 +106,7 @@ def mostrar_grafica_regresion(modelo, X, y, window):
     
     # Actualizar el elemento de imagen en la ventana con los nuevos bytes de la imagen
     window['-IMAGE2-'].update(data=img_bytes)
+
 
 
 def cosas_regresion(modelo, window):

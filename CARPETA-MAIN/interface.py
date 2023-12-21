@@ -40,7 +40,8 @@ def interface(dfs:dict):
         sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='2'),
         sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='3'),
         sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='4'),
-        sg.Button('Realizar Predicción', size=(20, 2), button_color=('white', 'grey'), visible=True,enable_events=True),
+        sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='5'),
+        sg.Button('Realizar Predicción', size=(20, 2), button_color=('white', 'pink'), visible=False,enable_events=True),
         sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
         sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
         sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
@@ -99,6 +100,8 @@ def interface(dfs:dict):
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
 
+
+
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -155,6 +158,9 @@ def interface(dfs:dict):
                 regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
                 regression.regression_elements(modelo.get_modelo(), window)
 
+            window['Realizar Predicción'].update(visible=True)
+            window['5'].update(visible=False)
+
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
 
@@ -187,6 +193,11 @@ def interface(dfs:dict):
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
             window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
             window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
+
+            window['Realizar Predicción'].update(visible=True)
+            window['5'].update(visible=False)
+
+            
 
 
         if event == 'Realizar Predicción':

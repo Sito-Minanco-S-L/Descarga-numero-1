@@ -45,7 +45,6 @@ class Modelo():
 
 
     def get_coeficientes(self):
-        print(self.modelo.params)
         return self.modelo.params
 
     def nombres_columnas(self):

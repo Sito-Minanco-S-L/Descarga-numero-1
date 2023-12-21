@@ -55,7 +55,6 @@ def interface(dfs:dict):
     window = sg.Window('Aplicación de Regresión', layout, finalize=True, resizable= False)
     while True:
         event, values = window.read()
-
         # Salir de la aplicación si se cierra la ventana o se presiona el botón 'Salir'
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
@@ -65,10 +64,8 @@ def interface(dfs:dict):
             try:
                 # Obtener la extensión del archivo                
                 extension = files.file_extension(selected_file)
-                
                 #testing
                 assert extension == 'xlsx' or extension == 'csv' or extension == 'db', "El archivo no tiene un formato adecuado (.xlsx, .csv, .db)"
-                
                 # Leer el archivo según la extensión y cargarlo en un DataFrame 
                 files.read_file(selected_file, dfs, extension)
                 
@@ -130,40 +127,33 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
-                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
         
-        # Calcula el R^2, su interpretación y los coeficientes del modelo
+                # Calcula el R^2, su interpretación y los coeficientes del modelo
                 # Calcula el R^2 y su interpretació
-
                 # Construir el texto con el R^2
                 # Calcula el R^2 y su interpretación
                 r_squared = modelo.get_modelo().rsquared
-                color, interpretacion = interpretar_r_cuadrado(r_squared)
+                color, interpretation = interpret_r_squared(r_squared)
 
                 # Actualizar el elemento de texto en la interfaz con los detalles del modelo
                 window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
-                window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretacion}')
+                window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
 
-
-
-                regression.cosas_regresion(modelo.get_modelo(), window)
+                regression.regression_elements(modelo.get_modelo(), window)
 
                 formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"
 
-
-    # Agregar los términos para las variables predictoras
+                # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
                     formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
 
-
-    # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
+                # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
                 window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
 
-
-
                 # Muestra la gráfica de regresión lineal
-                regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.cosas_regresion(modelo.get_modelo(), window)
+                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_modelo(), window)
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -183,22 +173,19 @@ def interface(dfs:dict):
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = cargar_modelo(selected_model)
-            regression.cosas_regresion(modelo.get_modelo(), window)
+            regression.regression_elements(modelo.get_modelo(), window)
             #Muestra la gráfica de regresión lineal
-            regression.mostrar_grafica_regresion(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
             r_squared = modelo.get_modelo().rsquared
-            color, interpretacion = interpretar_r_cuadrado(r_squared)
-
-    # Construir la fórmula del modelo
+            color, interpretation = interpret_r_squared(r_squared)
+            # Construir la fórmula del modelo
             formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"  # Término de la constante
-
-    # Agregar los términos para las variables predictoras
+            # Agregar los términos para las variables predictoras
             for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
                 formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
-
-    # Actualizar los elementos de texto en la interfaz con los detalles del modelo
+            # Actualizar los elementos de texto en la interfaz con los detalles del modelo
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
-            window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretacion}')
+            window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
             window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
 
 
@@ -210,22 +197,18 @@ def interface(dfs:dict):
             layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout])
         if event == 'Submit':
-            valores_x = []
+            values_x = []
             for i in range(len(modelo.nombres_columnas())):
-                valores_x.append(values['-valores-pred-'+str(i)])
-            resultado = realizar_predicción(modelo,valores_x)
-            texto = 'Resultado --> {:4f}'.format(resultado)
+                values_x.append(values['-valores-pred-'+str(i)])
+            result = realizar_predicción(modelo,values_x)
+            texto = 'Resultado --> {:4f}'.format(result)
             window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
 
-
-
-
-# Cerrar la ventana de la interfaz gráfica al salir
+    # Cerrar la ventana de la interfaz gráfica al salir
     window.close()
 
 
 '''
-
 Patrones de Diseño--->
 Template Method
 

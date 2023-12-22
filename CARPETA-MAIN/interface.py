@@ -86,6 +86,7 @@ def interface(dfs:dict):
                 table_data = dfs[selected_file].to_numpy().tolist()
                 table_headings = dfs[selected_file].columns.tolist()
                 window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
+                
 
                 if window['1'].visible:
                     window['Realizar Regresión Lineal'].update(visible=True)
@@ -196,6 +197,11 @@ def interface(dfs:dict):
 
             window['Realizar Predicción'].update(visible=True)
             window['5'].update(visible=False)
+            window['--TABLA--'].update(visible=False)
+            window['--COLUMN_X--'].update(visible=False)
+            window['--COLUMN_Y--'].update(visible=False)
+            
+
 
             
 

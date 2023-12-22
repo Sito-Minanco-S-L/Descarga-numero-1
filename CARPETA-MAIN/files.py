@@ -57,7 +57,6 @@ class ExcelFileReader:
         df = pd.read_excel(selected_file)
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
-        print(sg.popup_auto_close('¡Archivo de Excel cargado con éxito!'))
 
 class CsvFileReader:
     def read_file(self, selected_file, dfs):

@@ -137,4 +137,3 @@ def regression_elements(model, window):
     image = Image.open(image_path)
     image = image.resize((700, 400))  # Ajusta el tamaño de la imagen
     image.save(image_path)
-    # Actualizar el elemento de imagen en la interfaz con la nueva imagen generada

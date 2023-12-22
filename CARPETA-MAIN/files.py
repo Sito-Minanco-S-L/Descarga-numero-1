@@ -57,7 +57,6 @@ class ExcelFileReader:
         df = pd.read_excel(selected_file)
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
-        print(sg.popup_auto_close('¡Archivo de Excel cargado con éxito!'))
 
 class CsvFileReader:
     def read_file(self, selected_file, dfs):
@@ -74,7 +73,6 @@ class CsvFileReader:
         df = pd.read_csv(selected_file)
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
-        print(sg.popup_auto_close('¡Archivo CSV cargado con éxito!'))
 
 class DbFileReader:
     def read_file(self, selected_file, dfs):
@@ -98,7 +96,6 @@ class DbFileReader:
         df_numeric = df.select_dtypes(include=[np.number])
         dfs[selected_file] = df_numeric
         conexion.close()
-        print(sg.popup_auto_close('¡Archivo de Base de Datos cargado con éxito!'))
 
 def read_file(selected_file, dfs, extension):
     """

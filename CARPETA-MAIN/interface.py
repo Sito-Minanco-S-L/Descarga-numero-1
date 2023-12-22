@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 from sklearn.model_selection import train_test_split
 import regression
 import files
-from modelo import Modelo, cargar_modelo, realizar_predicción
+from modelo import Modelo, load_model, make_prediction
 from regression import *
 
 
@@ -130,33 +130,33 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
 
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
         
                 # Calcula el R^2, su interpretación y los coeficientes del modelo
                 # Calcula el R^2 y su interpretació
                 # Construir el texto con el R^2
                 # Calcula el R^2 y su interpretación
-                r_squared = modelo.get_modelo().rsquared
+                r_squared = modelo.get_model().rsquared
                 color, interpretation = interpret_r_squared(r_squared)
 
                 # Actualizar el elemento de texto en la interfaz con los detalles del modelo
                 window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
                 window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
 
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.regression_elements(modelo.get_model(), window)
 
-                formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"
+                formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
 
                 # Agregar los términos para las variables predictoras
-                for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
-                    formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
+                for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
+                    formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"
 
                 # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
                 window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
 
                 # Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_model(), window)
 
             window['Realizar Predicción'].update(visible=True)
             window['5'].update(visible=False)
@@ -174,21 +174,21 @@ def interface(dfs:dict):
 
 
         if event == '--FILENAME--':
-            modelo.save_modelo(values['--FILENAME--'])
+            modelo.save_model(values['--FILENAME--'])
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
-            modelo = cargar_modelo(selected_model)
-            regression.regression_elements(modelo.get_modelo(), window)
+            modelo = load_model(selected_model)
+            regression.regression_elements(modelo.get_model(), window)
             #Muestra la gráfica de regresión lineal
-            regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
-            r_squared = modelo.get_modelo().rsquared
+            regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
+            r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
             # Construir la fórmula del modelo
-            formula = f"F(x) = {modelo.get_coeficientes()[0]:.2f}"  # Término de la constante
+            formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"  # Término de la constante
             # Agregar los términos para las variables predictoras
-            for i, coef in enumerate(modelo.get_coeficientes()[1:], start=1):
-                formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.nombres_columnas()[i-1]})"
+            for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
+                formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"
             # Actualizar los elementos de texto en la interfaz con los detalles del modelo
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
             window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
@@ -203,15 +203,15 @@ def interface(dfs:dict):
         if event == 'Realizar Predicción':
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout = []
-            for i in range(len(modelo.nombres_columnas())):
-                layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.nombres_columnas()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
+            for i in range(len(modelo.columns_names())):
+                layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.columns_names()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
             layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout])
         if event == 'Submit':
             values_x = []
-            for i in range(len(modelo.nombres_columnas())):
+            for i in range(len(modelo.columns_names())):
                 values_x.append(values['-valores-pred-'+str(i)])
-            result = realizar_predicción(modelo,values_x)
+            result = make_prediction(modelo,values_x)
             texto = 'Resultado --> {:4f}'.format(result)
             window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
 
@@ -306,8 +306,8 @@ class InterfaceTemplate:
                     X = X.fillna(X.mean())
                 self.perform_regression(x, y, X, Y)
                 # Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(),modelo.get_y_data(), window)
-                regression.regression_elements(modelo.get_modelo(), window)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_model(), window)
 
                 window['Salir'].update(visible=False)
                 window['Cargar Modelo'].update(visible=False)
@@ -325,10 +325,10 @@ class InterfaceTemplate:
 
             if event == '--MODELO--':
                 selected_model = values['--MODELO--'] 
-                modelo = cargar_modelo(selected_model)
-                regression.regression_elements(modelo.get_modelo(), window)
+                modelo = load_model(selected_model)
+                regression.regression_elements(modelo.get_model(), window)
                 #Muestra la gráfica de regresión lineal
-                regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), window)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
 
         self.window.close()
 
@@ -343,7 +343,7 @@ class CustomInterface(InterfaceTemplate):
         df = self.dfs[selected_file]
         X = X.fillna(X.mean())
         modelo = Modelo(x, y, X, Y)
-        regression.show_regression_graph(modelo.get_modelo(), modelo.get_x_data(), modelo.get_y_data(), self.window)
-        regression.regression_elements(modelo.get_modelo(), self.window)
+        regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), self.window)
+        regression.regression_elements(modelo.get_model(), self.window)
 
 '''

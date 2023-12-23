@@ -146,7 +146,7 @@ def interface(dfs:dict):
 
                 regression.regression_elements(modelo.get_model(), window)
 
-                formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
+                formula = f"{modelo.columns_names()[0].upper()} = {modelo.get_coefficients()[0]:.2f}"
 
                 # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
@@ -186,7 +186,7 @@ def interface(dfs:dict):
             r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
             # Construir la fórmula del modelo
-            formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"  # Término de la constante
+            formula = f"{modelo.columns_names()[0].upper()} = {modelo.get_coefficients()[0]:.2f}"  # Término de la constante
             # Agregar los términos para las variables predictoras
             for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
                 formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"

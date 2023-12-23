@@ -59,6 +59,8 @@ def interface(dfs:dict):
         # Salir de la aplicación si se cierra la ventana o se presiona el botón 'Salir'
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
+        
+        
         # Cargar archivo si se presiona el botón 'Cargar Archivo'
         if event == '-Archivo-':
             selected_file = values['-Archivo-'] 
@@ -87,7 +89,6 @@ def interface(dfs:dict):
                 table_headings = dfs[selected_file].columns.tolist()
                 window.extend_layout(window['--TABLA--'], [[sg.Table(table_data, table_headings)]])
                 
-
                 if window['1'].visible:
                     window['Realizar Regresión Lineal'].update(visible=True)
                     window['1'].update(visible=False)
@@ -101,13 +102,11 @@ def interface(dfs:dict):
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
 
-
-
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
-        # Abrir la interfaz para realizar la regresión lineal si se presiona el botón 'Realizar Regresión Lineal'
 
+        # Abrir la interfaz para realizar la regresión lineal si se presiona el botón 'Realizar Regresión Lineal'
         if event == 'Realizar Regresión Lineal':
             selected_X = [key for key, value in values.items() if value is True and key != '--VAR Y--']
             selected_Y = selected_X[-1] - len(dfs[selected_file].columns)
@@ -173,9 +172,9 @@ def interface(dfs:dict):
             window['Salir'].update(visible=True)
 
 
-
         if event == '--FILENAME--':
             modelo.save_model(values['--FILENAME--'])
+
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
@@ -201,10 +200,6 @@ def interface(dfs:dict):
             window['--COLUMN_X--'].update(visible=False)
             window['--COLUMN_Y--'].update(visible=False)
             
-
-
-            
-
 
         if event == 'Realizar Predicción':
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')

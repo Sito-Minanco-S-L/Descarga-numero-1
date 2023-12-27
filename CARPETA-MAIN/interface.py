@@ -145,7 +145,7 @@ def interface(dfs:dict):
 
                 regression.regression_elements(modelo.get_model(), window)
 
-                formula = f"{modelo.columns_names()[0].upper()} = {modelo.get_coefficients()[0]:.2f}"
+                formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
 
                 # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
@@ -185,7 +185,7 @@ def interface(dfs:dict):
             r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
             # Construir la fórmula del modelo
-            formula = f"{modelo.columns_names()[0].upper()} = {modelo.get_coefficients()[0]:.2f}"  # Término de la constante
+            formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
             # Agregar los términos para las variables predictoras
             for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
                 formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"
@@ -196,9 +196,9 @@ def interface(dfs:dict):
 
             window['Realizar Predicción'].update(visible=True)
             window['5'].update(visible=False)
-            window['--TABLA--'].update(visible=False)
-            window['--COLUMN_X--'].update(visible=False)
-            window['--COLUMN_Y--'].update(visible=False)
+            window['--TABLA--'].update(visible=True)
+            window['--COLUMN_X--'].update(visible=True)
+            window['--COLUMN_Y--'].update(visible=True)
             
 
         if event == 'Realizar Predicción':

@@ -86,7 +86,7 @@ def show_regression_graph(model, X, y, window):
         figure = plt.figure()
         ax = figure.add_subplot(111, projection='3d')
         
-        ax.scatter(X.iloc[:, 0], X.iloc[:, 1], y, label=f'Observado vs. Predicción')
+        ax.scatter(X.iloc[:, 0], X.iloc[:, 1], y, label=f'Observado vs. Predicho')
         ax.set_xlabel(X.columns[0])
         ax.set_ylabel(X.columns[1])
         ax.set_zlabel(y.name)

@@ -1,0 +1,20 @@
+1.- Para ejecutar el código el usuario deberá ejecutar en la terminal el archivo main.py, el cual 
+    abrirá la interfaz (la cual ha sido definida en el archivo interface.py).
+
+2.- Una vez abierta la interfaz, el usuario podrá seleccionar la opción "Cargar Modelo", situada en
+    la esquina inferior derecha de la pantalla, seleccionado después alguno de los modelos
+    guardados (.pickle). Otra opción sería que el usuario pulsase "Browse", seleccionando después 
+    cual de los archivos (housing) quiere cargar.
+
+3.- Si el usuario ha cargado el modelo no será necesario este paso, pero si por lo contrario decide
+    realizar la regresión lineal pulsando el botón "Realizar Regresión Lineal", previamente deberá 
+    seleccionarlas variables con las que la quiere construir (que serán tantas variables X como 
+    quiera, pero solo una variable Y).
+
+4.- Una vez que tenemos nuestra nueva regresión lineal, podemos guardarla como un nuevo modelo
+    pulsando el botón "Guardar".
+
+5.- El usuario también puede realizar una predicción en función de la/s variable/s X pulsando el 
+    botón "Realizar Predicción" y después "Submit".
+
+6.- Cuando así lo desee, el usuario podrá detener la ejecución pulsando el botón "Salir".

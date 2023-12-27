@@ -145,8 +145,10 @@ def interface(dfs:dict):
 
                 regression.regression_elements(modelo.get_model(), window)
 
-                formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
-
+                # Obtener el nombre de la variable dependiente (Y)
+                variable_dependiente = modelo.get_y_name()
+                # Construir la fórmula del modelo
+                formula = f"{variable_dependiente} = {modelo.get_coefficients()[0]:.2f}"
                 # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
                     formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"
@@ -184,8 +186,10 @@ def interface(dfs:dict):
             regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
             r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
+            # Obtener el nombre de la variable dependiente (Y)
+            variable_dependiente = modelo.get_y_name()
             # Construir la fórmula del modelo
-            formula = f"F(x) = {modelo.get_coefficients()[0]:.2f}"
+            formula = f"{variable_dependiente} = {modelo.get_coefficients()[0]:.2f}"
             # Agregar los términos para las variables predictoras
             for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
                 formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"

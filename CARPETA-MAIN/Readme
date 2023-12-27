@@ -1,3 +1,5 @@
+MANUAL DE USUARIO DEL PROYECTO
+
 1.- Para ejecutar el código el usuario deberá ejecutar en la terminal el archivo main.py, el cual 
     abrirá la interfaz (la cual ha sido definida en el archivo interface.py).
 

@@ -60,7 +60,6 @@ def interface(dfs:dict):
         if event == sg.WIN_CLOSED or event == 'Salir':
             break
         
-        
         # Cargar archivo si se presiona el botón 'Cargar Archivo'
         if event == '-Archivo-':
             selected_file = values['-Archivo-'] 
@@ -80,7 +79,6 @@ def interface(dfs:dict):
                     list_X.append(sg.Checkbox(str(i)))
                     list_Y.append(sg.Radio(str(i), group_id='--VARIABLE_Y--'))
                     list_columns.append(i)
-
 
                 window.extend_layout(window['--COLUMN_X--'], [list_X])
                 window.extend_layout(window['--COLUMN_Y--'], [list_Y])
@@ -114,14 +112,11 @@ def interface(dfs:dict):
             x = [list_columns[key] for key in selected_X]
             y = list_columns[selected_Y]
 
-            
             if x and y: # Verificar si se seleccionaron variables tanto para X como para Y
                 # Obtener el DataFrame seleccionado
                 selected_file = values['-Archivo-']
                 df = dfs[selected_file]
-
                 # Verificar si las claves seleccionadas existen como columnas en el DataFrame
-
                 # Separar claramente las variables de X e Y
                 X = df[x]
                 Y = df[y]
@@ -138,7 +133,6 @@ def interface(dfs:dict):
                 # Calcula el R^2 y su interpretación
                 r_squared = modelo.get_model().rsquared
                 color, interpretation = interpret_r_squared(r_squared)
-
                 # Actualizar el elemento de texto en la interfaz con los detalles del modelo
                 window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
                 window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
@@ -152,10 +146,8 @@ def interface(dfs:dict):
                 # Agregar los términos para las variables predictoras
                 for i, coef in enumerate(modelo.get_coefficients()[1:], start=1):
                     formula += f" {'+' if coef >= 0 else '-'} {abs(coef):.2f} ({modelo.columns_names()[i-1]})"
-
                 # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
                 window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
-
                 # Muestra la gráfica de regresión lineal
                 regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
                 regression.regression_elements(modelo.get_model(), window)
@@ -173,17 +165,14 @@ def interface(dfs:dict):
             
             window['Salir'].update(visible=True)
 
-
         if event == '--FILENAME--':
             modelo.save_model(values['--FILENAME--'])
-
 
         if event == '--MODELO--':
             selected_model = values['--MODELO--'] 
             modelo = load_model(selected_model)
             regression.regression_elements(modelo.get_model(), window)
-            #Muestra la gráfica de regresión lineal
-            regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
+            
             r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
             # Obtener el nombre de la variable dependiente (Y)
@@ -197,14 +186,12 @@ def interface(dfs:dict):
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
             window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
             window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
-
             window['Realizar Predicción'].update(visible=True)
             window['5'].update(visible=False)
             window['--TABLA--'].update(visible=True)
             window['--COLUMN_X--'].update(visible=True)
             window['--COLUMN_Y--'].update(visible=True)
             
-
         if event == 'Realizar Predicción':
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout = []
@@ -212,6 +199,7 @@ def interface(dfs:dict):
                 layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.columns_names()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
             layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout])
+        
         if event == 'Submit':
             values_x = []
             for i in range(len(modelo.columns_names())):

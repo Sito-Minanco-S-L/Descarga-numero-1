@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "CARPETA-MAIN"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

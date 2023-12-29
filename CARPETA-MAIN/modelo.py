@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import statsmodels.api as sm
 import pickle
-
+import os
 
 def load_model(pickle_file_name):
     """
@@ -65,6 +65,9 @@ class Modelo():
         Returns:
         - model: Modelo de regresión lineal ajustado.
         """
+        if len(self.x) < 2 or len(self.y) < 2: #conclusión obtenida de los test realizados
+            raise ValueError("Se necesitan al menos dos puntos para ajustar un modelo de regresión lineal.")
+        
         x_train, x_test, y_train, y_test = train_test_split(self.x,self.y,test_size=0.2,random_state=1234, shuffle=True)
         x_train = sm.add_constant(x_train)
         model = sm.OLS(endog=y_train, exog=x_train)
@@ -94,8 +97,19 @@ def make_prediction(modelo, x:list):
     Returns:
     - result: Predicción realizada por el modelo para las variables independientes dadas.
     """
+    
+    '''
     result = modelo.get_coefficients()[0]
     for i in range(len(x)):
         result += ((modelo.get_coefficients()[i+1]) * int(x[i]))
     return result
-    
+    '''
+    if not isinstance(modelo, sm.regression.linear_model.RegressionResultsWrapper):
+        modelo = modelo.make_model()
+
+    # Ajusta la constante si es necesario
+    x = sm.add_constant(x) if modelo.model.exog.shape[1] > 1 else x
+    # Realiza la predicción
+    result = modelo.predict(x)
+    return result
+

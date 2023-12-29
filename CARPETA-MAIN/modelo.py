@@ -112,4 +112,5 @@ def make_prediction(modelo, x:list):
     # Realiza la predicción
     result = modelo.predict(x)
     return result
+    
 

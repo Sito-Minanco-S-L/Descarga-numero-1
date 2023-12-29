@@ -45,7 +45,6 @@ def interface(dfs:dict):
             sg.Button('', size=(20, 2), button_color=('white', 'grey'), visible=True, key='2'),
             sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='3'),
             sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='4'),
-            sg.Button('', size=(20, 2), button_color=('white', 'grey'),visible=True, key='5'),
             sg.InputText(change_submits=True, key='--FILENAME--', visible=False, enable_events=True),
             sg.FileSaveAs('Guardar', size=(20,2), button_color=('white', 'blue'), visible=False, enable_events=True, default_extension=".flp"),
             sg.InputText(change_submits=True, key='--MODELO--', visible=False, enable_events=True),
@@ -129,7 +128,7 @@ def interface(dfs:dict):
 
                 modelo = Modelo(x,y,X,Y)
                 window['-DATOS_REGRESION-'].update(visible=True)
-                #regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
         
                 # Calcula el R^2, su interpretación y los coeficientes del modelo
                 # Calcula el R^2 y su interpretació
@@ -141,7 +140,7 @@ def interface(dfs:dict):
                 window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
                 window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
 
-                #regression.regression_elements(modelo.get_model(), window)
+                regression.regression_elements(modelo.get_model(), window)
 
                 # Obtener el nombre de la variable dependiente (Y)
                 variable_dependiente = modelo.get_y_name()
@@ -153,10 +152,8 @@ def interface(dfs:dict):
                 # Actualiza el elemento de texto en la interfaz con los coeficientes calculados
                 window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
                 # Muestra la gráfica de regresión lineal
-                #regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
-                #regression.regression_elements(modelo.get_model(), window)
-
-            window['5'].update(visible=False)
+                regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
+                regression.regression_elements(modelo.get_model(), window)
 
             window['--PREDICCION--'].update(visible=True)
 
@@ -198,7 +195,6 @@ def interface(dfs:dict):
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
             window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
             window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
-            window['5'].update(visible=False)
             window['--PREDICCION--'].update(visible=True)
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout2 = []
@@ -215,6 +211,8 @@ def interface(dfs:dict):
             values_x = []
             for i in range(len(modelo.columns_names())):
                 values_x.append(values['-valores-pred-'+str(i)])
+                print(values['-valores-pred-'+str(i)])
+            print(values_x)
             result = make_prediction(modelo,values_x)
             texto = 'Resultado --> {:4f}'.format(result)
             window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])

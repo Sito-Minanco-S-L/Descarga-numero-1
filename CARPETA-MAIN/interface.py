@@ -183,8 +183,8 @@ def interface(dfs:dict):
             layout2.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout2])
             window['--TABLA--'].update(visible=False)
-            window['--COLUMN_X--'].update(visible=False)
-            window['--COLUMN_Y--'].update(visible=False)
+            window['--COLUMN_X--'].update(visible=True)
+            window['--COLUMN_Y--'].update(visible=True)
 
         if event == 'Submit':
             values_x = []

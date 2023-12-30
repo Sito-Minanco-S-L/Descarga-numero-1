@@ -98,12 +98,14 @@ def make_prediction(modelo, x:list):
     - result: Predicción realizada por el modelo para las variables independientes dadas.
     """
     
-    
+
+
     result = modelo.get_coefficients()[0]
     for i in range(len(x)):
         result += ((modelo.get_coefficients()[i+1]) * int(x[i]))
     return result
-    
+
+ 
     
     
 

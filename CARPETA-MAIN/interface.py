@@ -31,12 +31,13 @@ def interface(dfs:dict):
             sg.Column([[sg.Text('Fórmula del modelo:', key='-COEFICIENTES-', visible=False)],
             [sg.Text('', size=(30, 1), key='-R_SQUARED-', font=('Helvetica', 12))],
             [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))]]),
-    ]],key='-DATOS_REGRESION-', visible=False)],
-
-        [sg.Frame('',[
+            sg.Column([ [sg.Frame('',[
             [sg.Frame('Anotaciones', [[sg.Multiline(default_text='Anotaciones sobre la regresión lineal:', size=(30, 10), key='-ANNOTATIONS-', visible=False)]], element_justification='center'),
             sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')]],
-            key='--PREDICCION--', visible=False)],
+            key='--PREDICCION--', visible=False)]])
+    ]],key='-DATOS_REGRESION-', visible=False)],
+
+       
 
         [sg.Frame('',[[
             sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),

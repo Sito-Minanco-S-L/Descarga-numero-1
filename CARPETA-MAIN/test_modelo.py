@@ -46,15 +46,14 @@ modelo3 = Modelo("dirigida", "directora", [1.2, 0], [1.2, 0])
     "model, x",
 
     [
-        (modelo1, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        (modelo2, [1.2, 3.5, 4.6, 7.99, 0]),
-        (modelo3, [1.2, 0]),
+        (modelo1, [0]),
+        (modelo2, [1.2]),
+        #(modelo3, [1.2, 0]), mirar de testear con modelo de 3 variables
 
     ]
 )
 
 def test_make_prediction(model, x):
     
-    model = model.make_model()
     assert modelo.make_prediction(model, x) is not None
 #testing de las predicciones

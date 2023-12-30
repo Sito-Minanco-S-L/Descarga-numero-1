@@ -24,20 +24,20 @@ def interface(dfs:dict):
         [sg.InputText(default_text = 'Seleccione el archivo: ', key='-Archivo-', disabled=True, change_submits=True, enable_events=True), sg.FileBrowse(file_types=(("Archivos CSV y Excel y Base de Datos", "*.csv;*.xlsx;*.db"),))],
         [sg.Frame(' X ', [[sg.Column([],key='--COLUMN_X--')]])],
         [sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])],
-        [sg.Frame('',[],key='--TABLA--')],
-
+        [sg.Frame('',[],key='--TABLA--',visible=False)],
+        
         [sg.Frame('',[[
             sg.Column([[sg.Image(key='-IMAGE2-', size=(300, 200))]]),
             sg.Column([[sg.Text('Fórmula del modelo:', key='-COEFICIENTES-', visible=False)],
             [sg.Text('', size=(30, 1), key='-R_SQUARED-', font=('Helvetica', 12))],
             [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))]]),
-            sg.Column([ [sg.Frame('',[
-            [sg.Frame('Anotaciones', [[sg.Multiline(default_text='Anotaciones sobre la regresión lineal:', size=(30, 10), key='-ANNOTATIONS-', visible=False)]], element_justification='center'),
-            sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')]],
-            key='--PREDICCION--', visible=False)]])
     ]],key='-DATOS_REGRESION-', visible=False)],
 
-       
+       [sg.Frame('',[
+            [sg.Frame('Anotaciones', [[sg.Multiline(default_text='Anotaciones sobre la regresión lineal:', size=(30, 10), key='-ANNOTATIONS-', visible=False)]], element_justification='center'),
+            sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')]],
+            key='--PREDICCION--', visible=False)],
+
 
         [sg.Frame('',[[
             sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
@@ -157,6 +157,8 @@ def interface(dfs:dict):
                 regression.regression_elements(modelo.get_model(), window)
 
             window['--PREDICCION--'].update(visible=True)
+            window['--TABLA--'].update(visible=False)
+
 
             window['Salir'].update(visible=False)
             window['Cargar Modelo'].update(visible=False)
@@ -196,6 +198,7 @@ def interface(dfs:dict):
             window['-R_SQUARED-'].update(value=f'R-cuadrado: {r_squared:.4f}', text_color=color)
             window['-INTERPRETATION-'].update(value=f'Interpretación: {interpretation}')
             window['-COEFICIENTES-'].update(visible=True, value=formula, font=('Helvetica', 16))
+            window['--TABLA--'].update(visible=False)
             window['--PREDICCION--'].update(visible=True)
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout2 = []
@@ -203,7 +206,7 @@ def interface(dfs:dict):
                 layout2.append(sg.Frame(title='',layout=[[sg.Text(modelo.columns_names()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
             layout2.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout2])
-            window['--TABLA--'].update(visible=True)
+            window['--TABLA--'].update(visible=False)
             window['--COLUMN_X--'].update(visible=False)
             window['--COLUMN_Y--'].update(visible=False)
             

@@ -15,6 +15,8 @@ def interface(dfs:dict):
     Parameters:
     - dfs (dict): Diccionario que contiene los DataFrames cargados.
     """
+    prediction_done = False  # Variable para controlar si ya se ha realizado la predicción
+    
     column_1 = sg.Column([[sg.Frame(' X ', [[sg.Column([],key='--COLUMN_X--')]])]],pad=(0,0))
 
     column_2 = sg.Column([[sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])]],pad=(0,0))
@@ -65,6 +67,8 @@ def interface(dfs:dict):
         
         # Cargar archivo si se presiona el botón 'Cargar Archivo'
         if event == '-Archivo-':
+            # Restablecer la variable de estado al cargar un nuevo archivo
+            prediction_done = False
             selected_file = values['-Archivo-'] 
             try:
                 # Obtener la extensión del archivo                
@@ -195,14 +199,15 @@ def interface(dfs:dict):
             window['--COLUMN_X--'].update(visible=True)
             window['--COLUMN_Y--'].update(visible=True)
             
-        if event == 'Realizar Predicción':
+        if event == 'Realizar Predicción'and not prediction_done:
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout = []
             for i in range(len(modelo.columns_names())):
                 layout.append(sg.Frame(title='',layout=[[sg.Text(modelo.columns_names()[i].upper(), font='verdana')],[sg.Input('',size=(15,40), key=('-valores-pred-'+str(i)))]]))
             layout.append(sg.Frame(title='',layout=[[sg.Button('Submit', size=(6, 2))]]))
             window.extend_layout(window['--VARIABLES-PRED--'], [layout])
-        
+            prediction_done = True  # Marcar que la predicción se ha realizado
+
         if event == 'Submit':
             values_x = []
             for i in range(len(modelo.columns_names())):

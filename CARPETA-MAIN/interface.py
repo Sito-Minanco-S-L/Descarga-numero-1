@@ -88,6 +88,7 @@ def interface(dfs:dict):
                 window['3'].update(visible=False)
                 window['Salir'].update(visible=True)
                 window['4'].update(visible=False)
+                window['--TABLA--'].update(visible=True)
             except Exception as e:
                 sg.popup_error(f'Error: {str(e)}')
 
@@ -195,6 +196,7 @@ def interface(dfs:dict):
             result = make_prediction(modelo,values_x)
             texto = 'Resultado --> {:4f}'.format(result)
             window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
+            window['--VAR']
         
         # Mostrar la ventana de anotaciones solo en el instante de "Realizar Regresión Lineal" o "Modelo"
         if event in ['Realizar Regresión Lineal', '--MODELO--']:

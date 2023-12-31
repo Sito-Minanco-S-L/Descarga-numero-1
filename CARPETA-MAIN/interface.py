@@ -27,16 +27,18 @@ def interface(dfs:dict):
         [sg.Frame(' X ', [[sg.Column([],key='--COLUMN_X--')]])],
         [sg.Frame(' Y ', [[sg.Column([],key='--COLUMN_Y--')]])],
         [sg.Frame('',[],key='--TABLA--')],
-        [sg.Column([
-            [sg.Image(key='-IMAGE2-', size=(300, 200))],
-            [sg.Text('Fórmula del modelo:', key='-COEFICIENTES-', visible=False)],
-            [sg.Text('', size=(30, 1), key='-R_SQUARED-', font=('Helvetica', 12))],
-            [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))],
-        ], justification='center')],
-
-        [sg.Frame('Anotaciones', [[sg.Multiline(default_text='Anotaciones sobre la regresión lineal:', size=(30, 10), key='-ANNOTATIONS-', visible=False)]], element_justification='center')],
         
-        [sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')],
+        [sg.Frame('',[[
+             sg.Column([[sg.Image(key='-IMAGE2-', size=(300, 200))]]),
+             sg.Column([[sg.Text('Fórmula del modelo:', key='-COEFICIENTES-', visible=False)],
+             [sg.Text('', size=(30, 1), key='-R_SQUARED-', font=('Helvetica', 12))],
+             [sg.Text('', size=(90, 1), key='-INTERPRETATION-', font=('Helvetica', 12))]]),
+     ]],key='-DATOS_REGRESION-', visible=False)],
+
+        [sg.Frame('',[
+             [sg.Frame('Anotaciones', [[sg.Multiline(default_text='Anotaciones sobre la regresión lineal:', size=(30, 5), key='-ANNOTATIONS-', visible=False)]], element_justification='center'),
+             sg.Frame('',[[sg.Column([],key='--VARIABLES-PRED--')]],element_justification='centre',title_location='n', font='verdana', key='--HUECO-PRED--')]],
+             key='--PREDICCION--', visible=False)],
 
         [sg.Frame('',[[
             sg.Button('Realizar Regresión Lineal', size=(20, 2), button_color=('white', 'green'),visible=False),
@@ -69,6 +71,17 @@ def interface(dfs:dict):
         if event == '-Archivo-':
             # Restablecer la variable de estado al cargar un nuevo archivo
             prediction_done = False
+
+            if window['-DATOS_REGRESION-'].visible:
+                window['-DATOS_REGRESION-'].update(visible=False)
+            if window['--HUECO-PRED--'].visible:
+                window['--HUECO-PRED--'].update(visible=False)
+            
+            
+            
+            
+
+
             selected_file = values['-Archivo-'] 
             try:
                 # Obtener la extensión del archivo                
@@ -135,7 +148,7 @@ def interface(dfs:dict):
                 regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(), modelo.get_y_data(), window)
         
                 # Calcula el R^2, su interpretación y los coeficientes del modelo
-                # Calcula el R^2 y su interpretació
+                # Calcula el R^2 y su interpretación
                 # Construir el texto con el R^2
                 # Calcula el R^2 y su interpretación
                 r_squared = modelo.get_model().rsquared
@@ -159,6 +172,8 @@ def interface(dfs:dict):
                 regression.show_regression_graph(modelo.get_model(), modelo.get_x_data(),modelo.get_y_data(), window)
                 regression.regression_elements(modelo.get_model(), window)
 
+            window['--TABLA--'].update(visible=False)
+
             window['Realizar Predicción'].update(visible=True)
             window['5'].update(visible=False)
 
@@ -171,11 +186,16 @@ def interface(dfs:dict):
             window['Cargar Modelo'].update(visible=True)
             
             window['Salir'].update(visible=True)
+            window['--PREDICCION--'].update(visible=True)
+            window['-DATOS_REGRESION-'].update(visible=True)
 
+            
         if event == '--FILENAME--':
             modelo.save_model(values['--FILENAME--'])
 
         if event == '--MODELO--':
+            window['--TABLA--'].update(visible=False)
+            
             selected_model = values['--MODELO--'] 
             modelo = load_model(selected_model)
             regression.regression_elements(modelo.get_model(), window)
@@ -198,6 +218,8 @@ def interface(dfs:dict):
             window['--TABLA--'].update(visible=True)
             window['--COLUMN_X--'].update(visible=True)
             window['--COLUMN_Y--'].update(visible=True)
+            window['--PREDICCION--'].update(visible=True)
+            window['-DATOS_REGRESION-'].update(visible=True)
             
         if event == 'Realizar Predicción'and not prediction_done:
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
@@ -212,10 +234,14 @@ def interface(dfs:dict):
             values_x = []
             for i in range(len(modelo.columns_names())):
                 values_x.append(values['-valores-pred-'+str(i)])
-            result = make_prediction(modelo,values_x)
-            texto = 'Resultado --> {:4f}'.format(result)
-            window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
 
+            # Verificar si se han ingresado valores
+            if all(value for value in values_x):
+                result = make_prediction(modelo, values_x)
+                texto = 'Resultado --> {:4f}'.format(result)
+                window.extend_layout(window['--VARIABLES-PRED--'], [[sg.Text(text=texto,font='verdana',background_color='white',auto_size_text=50, text_color='black')]])
+            else:
+                sg.popup_error("Por favor, ingresa valores antes de hacer la predicción.")
         # Mostrar la ventana de anotaciones solo en el instante de "Realizar Regresión Lineal" o "Modelo"
         if event in ['Realizar Regresión Lineal', '--MODELO--']:
             
@@ -226,8 +252,6 @@ def interface(dfs:dict):
                 annotations = values['-ANNOTATIONS-']
                 # Puedes hacer lo que desees con el contenido de las anotaciones, como imprimirlo en la consola
                 print(annotations)
-        else:
-            window['-ANNOTATIONS-'].update(visible=False)
-
+      
     # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

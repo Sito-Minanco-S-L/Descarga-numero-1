@@ -48,7 +48,7 @@ modelo3 = Modelo("dirigida", "directora", [1.2, 0], [1.2, 0])
     [
         (modelo1, [0]),
         (modelo2, [1.2]),
-        (modelo3, [1.2, 0]), #mirar de testear con modelo de 3 variables
+       
 
     ]
 )

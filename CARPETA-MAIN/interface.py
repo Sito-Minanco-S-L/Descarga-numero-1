@@ -183,17 +183,26 @@ def interface(dfs:dict):
             window['-DATOS_REGRESION-'].update(visible=True)
             window['-ANNOTATIONS-'].update(visible=True)
             window['Guardar'].update(visible=True)
-
+            
             
         if event == '--FILENAME--':
+            modelo.set_descripcion(str(values['-ANNOTATIONS-']))
             modelo.save_model(values['--FILENAME--'])
+            print(modelo.get_descripcion())
 
         if event == '--MODELO--':
+            
             window['--TABLA--'].update(visible=False)
             
+            
+
             selected_model = values['--MODELO--'] 
             modelo = load_model(selected_model)
+            print(modelo.get_descripcion())
             regression.regression_elements(modelo.get_model(), window)
+
+            window['-ANNOTATIONS-'].update(visible=True)
+            window['-ANNOTATIONS-'].update(modelo.get_descripcion())
             
             r_squared = modelo.get_model().rsquared
             color, interpretation = interpret_r_squared(r_squared)
@@ -215,7 +224,8 @@ def interface(dfs:dict):
             window['--COLUMN_Y--'].update(visible=True)
             window['--PREDICCION--'].update(visible=True)
             window['-DATOS_REGRESION-'].update(visible=True)
-            
+            window['-ANNOTATIONS-'].update(value=(modelo.get_descripcion()))
+        
         if event == 'Realizar Predicción'and not prediction_done:
             window['-DATOS_REGRESION-'].update(visible=True)
             window['--HUECO-PRED--'].update(visible=True)
@@ -242,7 +252,8 @@ def interface(dfs:dict):
         # Mostrar la ventana de anotaciones solo en el instante de "Realizar Regresión Lineal" o "Modelo"
         if event in ['Realizar Regresión Lineal', '--MODELO--']:
             
-            window['-ANNOTATIONS-'].update(visible=True)
+            
+            #window.extend_layout(window['-ANNOTATIONS-'], [[modelo.get_descripcion()]])
 
             # Actualizar las anotaciones cuando el usuario escribe en el área de anotaciones
             if event == '-ANNOTATIONS-':

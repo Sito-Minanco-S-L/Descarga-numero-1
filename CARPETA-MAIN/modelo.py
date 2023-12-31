@@ -34,6 +34,8 @@ class Modelo():
         self.x = x
         self.y = y
         self.modelo = self.make_model()
+        self.descripcion = ""
+
 
     
     def get_x_data(self):       
@@ -56,6 +58,12 @@ class Modelo():
 
     def columns_names(self):
         return self.x.columns.tolist()
+    
+    def set_descripcion(self, nueva_descripcion):
+        self.descripcion = nueva_descripcion
+
+    def get_descripcion(self):
+        return self.descripcion
 
     def make_model(self):
         """

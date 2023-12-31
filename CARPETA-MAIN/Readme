@@ -1,5 +1,23 @@
 MANUAL DE USUARIO DEL PROYECTO
 
+EXTENSIONES QUE SE HAN DE INSTALAR:
+
+pip install PySimpleGUI
+pip install sklearn.model_selection
+pip install statsmodels.api
+pip install pickle
+pip install matplotlib.pyplot
+pip install statsmodels.api
+pip install PIL
+pip install pytest
+pip install os
+pip install pandas
+pip install numpy
+pip install sqlite3
+
+
+
+
 1.- Para ejecutar el código el usuario deberá ejecutar en la terminal el archivo main.py, el cual 
     abrirá la interfaz (la cual ha sido definida en el archivo interface.py).
 

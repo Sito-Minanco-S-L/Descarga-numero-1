@@ -3,7 +3,7 @@ from modelo import Modelo
 import pytest
 import os
 
-def test_load_model():
+def test_load_model(): #se testea la función encargada de cargar modelos.
     
     directorio = 'c:\****\****\******\*****'#ruta del directorio donde se encuentran los archivos
     archivo1 = 'modelo1.flp.pickle'
@@ -29,6 +29,18 @@ def test_load_model():
 )
 
 def test_make_model(dirigida, directora, x, y):
+    """
+    Testea la función implementada en el programa encargada de crear modelos.
+
+    Parameters:
+    - dirigida (str): Nombre asignado a la variable dirigida.
+    - directora (str): Nombre asignado a la variable directora.
+    - x (float): Lista de valores de la variable 'x'.
+    - y (float): Lista de valores de la variable 'y'.
+
+    Returns:
+    Bool
+    """
     modelo_ = Modelo(dirigida, directora, x, y)
     model = modelo_.make_model()
     assert model != None
@@ -54,6 +66,16 @@ modelo3 = Modelo("dirigida", "directora", [1.2, 0], [1.2, 0])
 )
 
 def test_make_prediction(model, x):
+    """
+    Testea la función implementada en el programa encargada de crear predicciones.
+
+    Parameters:
+    - model (object): Nombre asignado a la variable dirigida.
+    - x (float): valor de la variable con el que queremos predecir.
+    
+    Returns:
+    Bool
+    """
     
     assert modelo.make_prediction(model, x) is not None
 #testing de las predicciones

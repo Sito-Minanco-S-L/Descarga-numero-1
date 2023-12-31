@@ -17,6 +17,7 @@ MANUAL DE USUARIO DEL PROYECTO
     pulsando el botón "Guardar".
 
 5.- El usuario también puede realizar una predicción en función de la/s variable/s X pulsando el 
-    botón "Realizar Predicción" y después "Submit".
+    botón "Realizar Predicción" y después "Submit", si desea realizar varias predicciones deberá
+    reiniciar la innterfaz.
 
 6.- Cuando así lo desee, el usuario podrá detener la ejecución pulsando el botón "Salir".

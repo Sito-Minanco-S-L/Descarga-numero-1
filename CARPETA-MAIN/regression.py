@@ -38,6 +38,7 @@ def interpret_r_squared(r_squared):
     Returns:
     - Tuple: (str) Color para visualización, (str) Interpretación del R-cuadrado.
     """
+    # Evalúa el valor de R-cuadrado en rangos específicos y asigna color e interpretación correspondientes    
     if 0.8 <= r_squared <= 1:
         color = 'green'
         interpretation = 'Ajuste óptimo, el modelo explica a la perfección la relación de las variables'
@@ -53,7 +54,7 @@ def interpret_r_squared(r_squared):
     else:
         color = 'red'
         interpretation = 'Ajuste Pésimo, el modelo no es explicativo'
-
+    # Devuelve una tupla con el color y la interpretación
     return color, interpretation
 
 
@@ -99,7 +100,6 @@ def show_regression_graph(model, X, y, window):
         ax.plot(X.iloc[:, 0], y_pred, color='red', label='Regresión Lineal')
         ax.set_xlabel(X.columns[0])
         ax.set_ylabel(y.name)
-
     ax.legend()
 
     # Ajustar el tamaño de la figura
@@ -127,13 +127,16 @@ def regression_elements(model, window):
     Returns:
     - None
     """
+    # Calcula el coeficiente de determinación (R-cuadrado) y su interpretación    
     r_squared = model.rsquared
     color, interpretation = interpret_r_squared(r_squared)
-
+    # Obtiene un resumen detallado del modelo
     results = model.summary()
     results_str = str(results)
-   
+    # Convierte el resumen del modelo a una imagen para mostrar en la interfaz
     image_path = convert_text_to_image(results_str)
     image = Image.open(image_path)
-    image = image.resize((700, 400))  # Ajusta el tamaño de la imagen
+    # Ajusta el tamaño de la imagen    
+    image = image.resize((700, 400))
+    # Guarda la imagen ajustada    
     image.save(image_path)

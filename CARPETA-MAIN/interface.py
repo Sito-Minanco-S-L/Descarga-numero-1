@@ -70,19 +70,14 @@ def interface(dfs:dict):
         # Cargar archivo si se presiona el botón 'Cargar Archivo'
         if event == '-Archivo-':
             # Restablecer la variable de estado al cargar un nuevo archivo
-            prediction_done = False
+            modelo_cargado = False
 
             if window['-DATOS_REGRESION-'].visible:
                 window['-DATOS_REGRESION-'].update(visible=False)
             if window['--HUECO-PRED--'].visible:
                 window['--HUECO-PRED--'].update(visible=False)
-            
-            
-            
-            
 
-
-            selected_file = values['-Archivo-'] 
+            selected_file = values['-Archivo-']
             try:
                 # Obtener la extensión del archivo                
                 extension = files.file_extension(selected_file)
@@ -178,16 +173,16 @@ def interface(dfs:dict):
             window['5'].update(visible=False)
 
             window['Salir'].update(visible=False)
-            window['Cargar Modelo'].update(visible=False)
+            window['Cargar Modelo'].update(visible=True)
 
             window['Guardar'].update(visible=True)
             window['2'].update(visible=False)
-
-            window['Cargar Modelo'].update(visible=True)
-            
+            #window['Cargar Modelo'].update(visible=True)
             window['Salir'].update(visible=True)
             window['--PREDICCION--'].update(visible=True)
             window['-DATOS_REGRESION-'].update(visible=True)
+            window['-ANNOTATIONS-'].update(visible=True)
+            window['Guardar'].update(visible=True)
 
             
         if event == '--FILENAME--':
@@ -222,6 +217,8 @@ def interface(dfs:dict):
             window['-DATOS_REGRESION-'].update(visible=True)
             
         if event == 'Realizar Predicción'and not prediction_done:
+            window['-DATOS_REGRESION-'].update(visible=True)
+            window['--HUECO-PRED--'].update(visible=True)
             window['--HUECO-PRED--'].update('PREDICCION A PARTIR DEL MODELO')
             layout = []
             for i in range(len(modelo.columns_names())):
@@ -252,6 +249,7 @@ def interface(dfs:dict):
                 annotations = values['-ANNOTATIONS-']
                 # Puedes hacer lo que desees con el contenido de las anotaciones, como imprimirlo en la consola
                 print(annotations)
+                
       
     # Cerrar la ventana de la interfaz gráfica al salir
     window.close()

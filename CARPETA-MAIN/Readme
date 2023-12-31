@@ -6,12 +6,12 @@ MANUAL DE USUARIO DEL PROYECTO
 2.- Una vez abierta la interfaz, el usuario podrá seleccionar la opción "Cargar Modelo", situada en
     la esquina inferior derecha de la pantalla, seleccionado después alguno de los modelos
     guardados (.pickle). Otra opción sería que el usuario pulsase "Browse", seleccionando después 
-    cual de los archivos (housing) quiere cargar.
+    cual de los archivos de datos (housing) quiere cargar para realizar una regresión.
 
-3.- Si el usuario ha cargado el modelo no será necesario este paso, pero si por lo contrario decide
-    realizar la regresión lineal pulsando el botón "Realizar Regresión Lineal", previamente deberá 
-    seleccionarlas variables con las que la quiere construir (que serán tantas variables X como 
-    quiera, pero solo una variable Y).
+3.- Si el usuario ha cargado un modelo no será necesario este paso, pero si por lo contrario decide
+    cargar un archivo de datos y realizar la regresión lineal, debera seleccionar las variables con las 
+    que la quiere construir (que serán tantas variables X como quiera, pero solo una variable Y)
+    posteriormente tendrá que pulsar el botón "Realizar Regresión Lineal".
 
 4.- Una vez que tenemos nuestra nueva regresión lineal, podemos guardarla como un nuevo modelo
     pulsando el botón "Guardar".
